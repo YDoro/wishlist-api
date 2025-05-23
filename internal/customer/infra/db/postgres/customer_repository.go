@@ -3,7 +3,6 @@ package postgresDB
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/ydoro/wishlist/internal/customer/domain"
 )
@@ -18,14 +17,9 @@ func NewCustomerRepository(db *sql.DB) *customerRepo {
 	}
 }
 
-func (r *customerRepo) Create(ctx context.Context, customer *domain.Customer) (string, error) {
+func (r *customerRepo) Create(ctx context.Context, customer *domain.Customer) error {
 	query := `INSERT INTO customers (id, name, email) VALUES ($1, $2, $3)`
+	_, err := r.DB.ExecContext(ctx, query, customer.ID, customer.Name, customer.Email)
 
-	var id int64
-	err := r.DB.QueryRowContext(ctx, query, customer.ID, customer.Name, customer.Email).Scan(&id)
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("%d", id), nil
+	return err
 }

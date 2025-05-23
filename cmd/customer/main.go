@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	config "github.com/ydoro/wishlist/config/customer"
+	"github.com/ydoro/wishlist/internal/customer/infra/adapter"
 	postgresDB "github.com/ydoro/wishlist/internal/customer/infra/db/postgres"
 	"github.com/ydoro/wishlist/internal/customer/infra/delivery/http"
 	"github.com/ydoro/wishlist/internal/customer/usecase"
@@ -37,8 +38,9 @@ func main() {
 	defer conn.Close()
 
 	customerRepo := postgresDB.NewCustomerRepository(conn)
+	idGenerator := adapter.UUIDGenerator{}
 
-	ucs := usecase.NewCustomerUseCase(customerRepo)
+	ucs := usecase.NewCustomerUseCase(customerRepo, idGenerator)
 
 	router := http.SetupRoutes(r, ucs)
 	router.Run(":8080")
