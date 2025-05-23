@@ -38,7 +38,7 @@ func LoadConfig() *Config {
 func getEnv(key string) string {
 	val := os.Getenv(key)
 	if val == "" {
-		log.Fatalf("ENV variável obrigatória não definida: %s", key)
+		log.Fatalf("required environment variable not set: %s", key)
 	}
 	return val
 }
