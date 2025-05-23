@@ -10,10 +10,9 @@ COPY . .
 
 ENV GOOS=linux
 ENV GOARCH=amd64
+ 
+RUN go install -tags "postgres" github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-RUN go build -o /app/customer-api ./cmd/customer/main.go
+RUN go build -o /bin/customer-api ./cmd/customer/main.go
 
 EXPOSE 8080
-
-# Defina o comando para executar as APIs
-CMD ["./customer-api"]

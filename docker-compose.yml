@@ -1,16 +1,20 @@
-version: '3.8'
-
 services:
   customer-api:
+    container_name: customer-api
     build: .
     ports:
       - "8080:8080"
     depends_on:
       - postgres
+      - migrate
     env_file:
       - .env
-    command: ./customer-api
-
+    command: "customer-api"
+  migrate:
+    build: .
+    command: ["migrate", "-path", "internal/customer/infra/db/postgres/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}", "up"] 
+    depends_on:
+      - postgres
   postgres:
     image: postgres:15
     restart: always
