@@ -15,4 +15,8 @@ RUN go install -tags "postgres" github.com/golang-migrate/migrate/v4/cmd/migrate
 
 RUN go build -o /bin/customer-api ./cmd/customer/main.go
 
+
+# TODO - MOVE TO DEV MODE
+RUN go install github.com/air-verse/air@latest
+RUN air -v
 EXPOSE 8080

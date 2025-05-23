@@ -9,7 +9,9 @@ services:
       - migrate
     env_file:
       - .env
-    command: "customer-api"
+    command: ["air"]
+    volumes:
+      - .:/app
   migrate:
     build: .
     command: ["migrate", "-path", "internal/customer/infra/db/postgres/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}", "up"] 
