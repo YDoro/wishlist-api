@@ -5,7 +5,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
-	"github.com/ydoro/wishlist/internal/customer/infra/adapter"
+	"github.com/ydoro/wishlist/internal/infra/adapter"
 )
 
 func TestJWTEncrypter_Encrypt(t *testing.T) {

@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	config "github.com/ydoro/wishlist/config/customer"
-	"github.com/ydoro/wishlist/internal/customer/infra/adapter"
-	postgresDB "github.com/ydoro/wishlist/internal/customer/infra/db/postgres"
-	"github.com/ydoro/wishlist/internal/customer/infra/delivery/http"
+	"github.com/ydoro/wishlist/internal/infra/adapter"
+	postgresDB "github.com/ydoro/wishlist/internal/infra/db/postgres"
+	"github.com/ydoro/wishlist/internal/infra/delivery/http"
 	"github.com/ydoro/wishlist/internal/usecase"
 )
 

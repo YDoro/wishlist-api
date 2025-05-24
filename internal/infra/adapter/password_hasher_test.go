@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/ydoro/wishlist/internal/customer/infra/adapter"
+	"github.com/ydoro/wishlist/internal/infra/adapter"
 )
 
 func TestPasswordHasher_Hash(t *testing.T) {
