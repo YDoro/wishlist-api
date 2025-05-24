@@ -23,3 +23,19 @@ func (r *customerRepo) Create(ctx context.Context, customer *domain.Customer) er
 
 	return err
 }
+
+func (r *customerRepo) GetByEmail(ctx context.Context, email string) (*domain.Customer, error) {
+	query := `SELECT id, name, email, password, created_at, updated_at FROM customers WHERE email = $1`
+	row := r.DB.QueryRowContext(ctx, query, email)
+
+	customer := &domain.Customer{}
+	err := row.Scan(&customer.ID, &customer.Name, &customer.Email, &customer.Password, &customer.CreatedAt, &customer.UpdatedAt)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return customer, nil
+}

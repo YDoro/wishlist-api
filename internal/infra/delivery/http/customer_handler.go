@@ -32,16 +32,16 @@ func NewCustomerHandler(r *gin.RouterGroup, uc domain.CreateCustomerUC) {
 // @Produce json
 // @Param customer body inputs.CreateCustomerRequest true "Client data"
 // @Success 201 {object} domain.Customer
-// @Failure 401 {object} outputs.ErrorResponse
+// @Failure 400 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/v1/customers [post]
+// @Router /api/customers [post]
 //
 // NOTE - Handlers can be moved to a separated layer and vendor agnostic and here we can use some adapters to connect the router with the application
 func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 	var customer inputs.CreateCustomerRequest
 
 	if err := c.ShouldBindJSON(&customer); err != nil {
-		c.JSON(401, outputs.ErrorResponse{
+		c.JSON(400, outputs.ErrorResponse{
 			Message: "Invalid input"})
 		return
 	}
@@ -50,7 +50,7 @@ func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 
 	if err != nil {
 		if e.IsValidationError(err) {
-			c.JSON(401, outputs.ErrorResponse{
+			c.JSON(400, outputs.ErrorResponse{
 				Message: err.Error(),
 			})
 			return
