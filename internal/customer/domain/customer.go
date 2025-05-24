@@ -21,7 +21,7 @@ type IncommingCustomer struct {
 	Password string `json:"password"`
 }
 
-type CustomerRepository interface {
+type CustomerCreationRepository interface {
 	Create(ctx context.Context, customer *Customer) error
 }
 

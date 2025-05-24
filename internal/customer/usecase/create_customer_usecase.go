@@ -10,12 +10,12 @@ import (
 )
 
 type CreateCustomerUseCase struct {
-	repo      domain.CustomerRepository
+	repo      domain.CustomerCreationRepository
 	idGen     domain.IDGenerator
 	pwdHasher domain.Hasher
 }
 
-func NewCreateCustomerUseCase(customerRepository domain.CustomerRepository, idGen domain.IDGenerator, hasher domain.Hasher) *CreateCustomerUseCase {
+func NewCreateCustomerUseCase(customerRepository domain.CustomerCreationRepository, idGen domain.IDGenerator, hasher domain.Hasher) *CreateCustomerUseCase {
 	return &CreateCustomerUseCase{
 		repo:      customerRepository,
 		idGen:     idGen,
