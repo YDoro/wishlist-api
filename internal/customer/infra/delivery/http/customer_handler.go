@@ -11,10 +11,10 @@ import (
 )
 
 type CunstomerHandler struct {
-	createCustomerUC domain.CustomerUC
+	createCustomerUC domain.CreateCustomerUC
 }
 
-func NewCustomerHandler(r *gin.RouterGroup, uc domain.CustomerUC) {
+func NewCustomerHandler(r *gin.RouterGroup, uc domain.CreateCustomerUC) {
 
 	handler := &CunstomerHandler{
 		createCustomerUC: uc,

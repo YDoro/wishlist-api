@@ -21,12 +21,15 @@ type IncommingCustomer struct {
 	Password string `json:"password"`
 }
 
-type CustomerCreationRepository interface {
-	Create(ctx context.Context, customer *Customer) error
+// Usecases
+type CreateCustomerUC interface {
+	CreateCustomerWithEmail(ctx context.Context, data IncommingCustomer) (string, error)
 }
 
-type CustomerUC interface {
-	CreateCustomerWithEmail(ctx context.Context, data IncommingCustomer) (string, error)
+// repositories
+
+type CustomerCreationRepository interface {
+	Create(ctx context.Context, customer *Customer) error
 }
 
 // NOTE - this getter interfaces couldbe merged into a single one with some abstraction
