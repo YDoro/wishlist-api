@@ -1,4 +1,4 @@
-//go:generate mockgen --build_flags=--mod=mod -destination=../../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository
 
 package domain
 

@@ -3,7 +3,7 @@ package errors
 import (
 	"fmt"
 
-	"github.com/ydoro/wishlist/internal/customer/domain"
+	"github.com/ydoro/wishlist/internal/domain"
 )
 
 type AuthenticationError struct {

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/ydoro/wishlist/internal/customer/domain"
+	"github.com/ydoro/wishlist/internal/domain"
 	e "github.com/ydoro/wishlist/pkg/wishlist/presentation/errors"
 )
 

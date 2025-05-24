@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/ydoro/wishlist/internal/customer/domain"
+	"github.com/ydoro/wishlist/internal/domain"
 	e "github.com/ydoro/wishlist/pkg/wishlist/presentation/errors"
 	"github.com/ydoro/wishlist/pkg/wishlist/presentation/inputs"
 	"github.com/ydoro/wishlist/pkg/wishlist/presentation/outputs"
@@ -55,7 +55,7 @@ func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 			})
 			return
 		}
-		fmt.Println("Failed to create customer: %v", err)
+		fmt.Printf("\nFailed to create customer: %v", err)
 		c.JSON(500, gin.H{"error": "Failed to create customer"})
 		return
 	}

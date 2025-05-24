@@ -1,3 +1,5 @@
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/auth_mock.go -package=mocks . Authenticator
+
 package domain
 
 import "context"

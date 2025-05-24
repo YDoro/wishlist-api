@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/ydoro/wishlist/internal/customer/domain"
+	"github.com/ydoro/wishlist/internal/domain"
 )
 
 type customerRepo struct {

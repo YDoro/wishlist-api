@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
-	"github.com/ydoro/wishlist/internal/customer/domain"
+	"github.com/ydoro/wishlist/internal/domain"
 )
 
 func SetupRoutes(r *gin.Engine, uc domain.CreateCustomerUC) *gin.Engine {

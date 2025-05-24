@@ -1,4 +1,4 @@
-//go:generate mockgen --build_flags=--mod=mod -destination=../../../mock/domain/criptography_mock.go -package=mocks . Hasher,HashComparer,Encrypter
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/criptography_mock.go -package=mocks . Hasher,HashComparer,Encrypter
 
 package domain
 
