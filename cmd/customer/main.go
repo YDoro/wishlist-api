@@ -8,7 +8,7 @@ import (
 	"github.com/ydoro/wishlist/internal/customer/infra/adapter"
 	postgresDB "github.com/ydoro/wishlist/internal/customer/infra/db/postgres"
 	"github.com/ydoro/wishlist/internal/customer/infra/delivery/http"
-	"github.com/ydoro/wishlist/internal/customer/usecase"
+	"github.com/ydoro/wishlist/internal/usecase"
 )
 
 // @title Wishlist API GO
