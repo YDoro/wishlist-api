@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/pkg/presentation/errors"
-	"github.com/ydoro/wishlist/pkg/presentation/inputs"
+	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	"github.com/ydoro/wishlist/internal/presentation/inputs"
 )
 
 type PasswordAuthenticationUseCase struct {

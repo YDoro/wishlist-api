@@ -8,10 +8,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ydoro/wishlist/internal/domain"
+	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	"github.com/ydoro/wishlist/internal/presentation/inputs"
 	"github.com/ydoro/wishlist/internal/usecase"
 	mocks "github.com/ydoro/wishlist/mock/domain"
-	e "github.com/ydoro/wishlist/pkg/presentation/errors"
-	"github.com/ydoro/wishlist/pkg/presentation/inputs"
 	"go.uber.org/mock/gomock"
 )
 

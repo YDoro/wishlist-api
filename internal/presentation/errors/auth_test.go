@@ -5,22 +5,22 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	e "github.com/ydoro/wishlist/pkg/presentation/errors"
+	e "github.com/ydoro/wishlist/internal/presentation/errors"
 )
 
-func TestIsValidationError(t *testing.T) {
+func TestIsAuthenticationError(t *testing.T) {
 	tests := []struct {
 		name string
 		err  error
 		want bool
 	}{
 		{
-			name: "ValidationError",
-			err:  e.NewRequiredFieldError("email"),
+			name: "isAuthenticationError",
+			err:  e.NewAuthenticationError("password"),
 			want: true,
 		},
 		{
-			name: "not ValidationError",
+			name: "isNotAuthenticationError",
 			err:  fmt.Errorf("some other error"),
 			want: false,
 		},
@@ -33,26 +33,26 @@ func TestIsValidationError(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := e.IsValidationError(tt.err); got != tt.want {
-				t.Errorf("IsValidationError() = %v, want %v", got, tt.want)
+			if got := e.IsAuthenticationError(tt.err); got != tt.want {
+				t.Errorf("IsAuthenticationError() = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
 
-func TestValidationErrorMessages(t *testing.T) {
+func TestAuthErrorMessages(t *testing.T) {
 	tests := []struct {
 		name string
 		err  error
 		want string
 	}{
 		{
-			name: "ValidationError",
-			err:  e.NewRequiredFieldError("email"),
-			want: "'email' is required",
+			name: "AuthenticationError message",
+			err:  e.NewAuthenticationError("password"),
+			want: "password authentication method",
 		},
 		{
-			name: "not ValidationError",
+			name: "not AuthenticationError",
 			err:  fmt.Errorf("some other error"),
 			want: "some other error",
 		},
