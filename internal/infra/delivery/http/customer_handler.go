@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/pkg/wishlist/presentation/errors"
-	"github.com/ydoro/wishlist/pkg/wishlist/presentation/inputs"
-	"github.com/ydoro/wishlist/pkg/wishlist/presentation/outputs"
+	e "github.com/ydoro/wishlist/pkg/presentation/errors"
+	"github.com/ydoro/wishlist/pkg/presentation/inputs"
+	"github.com/ydoro/wishlist/pkg/presentation/outputs"
 )
 
 type CunstomerHandler struct {

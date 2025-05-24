@@ -10,7 +10,7 @@ import (
 	"github.com/ydoro/wishlist/internal/domain"
 	"github.com/ydoro/wishlist/internal/usecase"
 	mocks "github.com/ydoro/wishlist/mock/domain"
-	e "github.com/ydoro/wishlist/pkg/wishlist/presentation/errors"
+	e "github.com/ydoro/wishlist/pkg/presentation/errors"
 	"go.uber.org/mock/gomock"
 )
 
