@@ -42,6 +42,6 @@ func main() {
 
 	ucs := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
 
-	router := http.SetupRoutes(r, ucs, http.AuthMiddleware(cfg.JWTSecret))
+	router := http.SetupRoutes(r, ucs)
 	router.Run(":8080")
 }
