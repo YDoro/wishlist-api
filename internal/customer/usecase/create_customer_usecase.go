@@ -7,19 +7,19 @@ import (
 	"github.com/ydoro/wishlist/internal/customer/domain"
 )
 
-type CustomerUseCase struct {
+type CreateCustomerUseCase struct {
 	repo  domain.CustomerRepository
 	idGen domain.IDGenerator
 }
 
-func NewCustomerUseCase(customerRepository domain.CustomerRepository, idGen domain.IDGenerator) *CustomerUseCase {
-	return &CustomerUseCase{
+func NewCreateCustomerUseCase(customerRepository domain.CustomerRepository, idGen domain.IDGenerator) *CreateCustomerUseCase {
+	return &CreateCustomerUseCase{
 		repo:  customerRepository,
 		idGen: idGen,
 	}
 }
 
-func (uc *CustomerUseCase) CreateCustomerWithEmail(ctx context.Context, email string, name string) (string, error) {
+func (uc *CreateCustomerUseCase) CreateCustomerWithEmail(ctx context.Context, email string, name string) (string, error) {
 	id, err := uc.idGen.Generate()
 
 	if err != nil {
