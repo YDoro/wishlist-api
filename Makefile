@@ -9,12 +9,10 @@ PORT=8080
 APP_DIR=/app
 
 start_docker: 
-	@docker-compose pull
-	@docker-compose up -d --no-build
+	@docker-compose --progress quiet up -d --no-build --quiet-pull
 
 docker-run: start_docker
 	@docker exec -it $(APP_NAME) sh -c "$(CMD)"
-
 
 generate:
 	@echo 'generating files ...'
