@@ -28,3 +28,12 @@ type CustomerCreationRepository interface {
 type CustomerUC interface {
 	CreateCustomerWithEmail(ctx context.Context, data IncommingCustomer) (string, error)
 }
+
+// NOTE - this getter interfaces couldbe merged into a single one with some abstraction
+type GetCustomerByEmailRepository interface {
+	GetByEmail(ctx context.Context, email string) (*Customer, error)
+}
+
+type GetCustomerByIDRepository interface {
+	GetByID(ctx context.Context, id string) (*Customer, error)
+}
