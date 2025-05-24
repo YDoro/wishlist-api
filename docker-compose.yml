@@ -15,7 +15,7 @@ services:
   migrate:
     container_name: migrate
     build: .
-    command: ["migrate", "-path", "internal/customer/infra/db/postgres/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}", "up"] 
+    command: ["migrate", "-path", "internal/infra/db/postgres/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}", "up"] 
     depends_on:
       - postgres
   postgres:

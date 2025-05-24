@@ -13,7 +13,7 @@ ENV GOARCH=amd64
  
 RUN go install -tags "postgres" github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
-RUN go build -o /bin/customer-api ./cmd/customer/main.go
+RUN go build -o /bin/customer-api ./cmd/main.go
 
 
 # TODO - MOVE TO DEV MODE
