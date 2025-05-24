@@ -23,9 +23,16 @@ func NewPasswordAuthenticationUseCase(comparer domain.HashComparer, userGetter d
 	}
 }
 
-func (p *PasswordAuthenticationUseCase) Authenticate(ctx context.Context, credentials inputs.PwdAuth) (string, error) {
+func (p *PasswordAuthenticationUseCase) Authenticate(ctx context.Context, credentials any) (string, error) {
+	pwdAuth, ok := credentials.(inputs.PwdAuth)
+	if !ok {
+		return "", &e.ValidationError{
+			Field: "credentials",
+			Err:   "Invalid credentials type",
+		}
+	}
 	// retrieve the user by email
-	user, err := p.UserGetter.GetByEmail(ctx, credentials.Email)
+	user, err := p.UserGetter.GetByEmail(ctx, pwdAuth.Email)
 	if err != nil {
 		return "", err
 	}
@@ -35,7 +42,7 @@ func (p *PasswordAuthenticationUseCase) Authenticate(ctx context.Context, creden
 	}
 
 	// compare the password with the hash
-	err = p.HashComparer.Compare(user.Password, credentials.Password)
+	err = p.HashComparer.Compare(user.Password, pwdAuth.Password)
 	if err != nil {
 		return "", e.NewAuthenticationError(domain.AuthMethodPassword)
 	}
