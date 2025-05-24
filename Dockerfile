@@ -18,5 +18,8 @@ RUN go build -o /bin/customer-api ./cmd/customer/main.go
 
 # TODO - MOVE TO DEV MODE
 RUN go install github.com/air-verse/air@latest
+RUN go install go.uber.org/mock/mockgen@latest
 RUN air -v
+
+
 EXPOSE 8080

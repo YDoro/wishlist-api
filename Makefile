@@ -7,13 +7,20 @@ PWD=$(shell pwd)
 PORT=8080
 
 APP_DIR=/app
-#DB_STRING=postgres://$$$$DB_USER:$$$$DB_PASSWORD@$$$$DB_HOST:$$$$DB_PORT/$$$$DB_NAME?sslmode=disable
 
-	
-docker-run:
-	@docker exec -it $(APP_NAME) sh -c "$(DOCKER_COMMAND)"
+start_docker: 
+	@docker-compose pull
+	@docker-compose up -d --no-build
 
-test:
-	@make docker-run DOCKER_COMMAND='go test ./...'
-#migrate:
-#	@make docker-run DOCKER_COMMAND='migrate -path ./internal/customer/infra/db/postgres/migrations -database "$(DB_STRING)" up'
+docker-run: start_docker
+	@docker exec -it $(APP_NAME) sh -c "$(CMD)"
+
+
+generate:
+	@echo 'generating files ...'
+	@make docker-run CMD="go generate ./..."
+	@echo 'done!'
+
+test: generate
+	@echo 'generating'
+	@make docker-run CMD='go test ./...'
