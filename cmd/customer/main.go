@@ -40,7 +40,7 @@ func main() {
 	customerRepo := postgresDB.NewCustomerRepository(conn)
 	idGenerator := adapter.UUIDGenerator{}
 
-	ucs := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator)
+	ucs := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
 
 	router := http.SetupRoutes(r, ucs, http.AuthMiddleware(cfg.JWTSecret))
 	router.Run(":8080")
