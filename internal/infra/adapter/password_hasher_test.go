@@ -52,3 +52,55 @@ func TestPasswordHasher_Hash(t *testing.T) {
 	}
 
 }
+
+func TestPasswordHasher_Compare(t *testing.T) {
+	tests := []struct {
+		name          string
+		password      string
+		setupPassword string
+		wantErr       bool
+	}{
+		{
+			name:          "matching passwords",
+			setupPassword: "correctpassword",
+			password:      "correctpassword",
+			wantErr:       false,
+		},
+		{
+			name:          "non-matching passwords",
+			setupPassword: "correctpassword",
+			password:      "wrongpassword",
+			wantErr:       true,
+		},
+		{
+			name:          "empty password should not match hash",
+			setupPassword: "somepassword",
+			password:      "",
+			wantErr:       true,
+		},
+		{
+			name:          "empty setup password",
+			setupPassword: "",
+			password:      "somepassword",
+			wantErr:       true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			hasher := adapter.NewPasswordHasher(10)
+
+			hashedPassword, err := hasher.Hash(tt.setupPassword)
+			assert.NoError(t, err)
+
+			err = hasher.Compare(hashedPassword, tt.password)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
