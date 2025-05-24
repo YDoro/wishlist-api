@@ -2,5 +2,6 @@ vendor/*
 **/.env
 **/tmp
 mock/*
+coverage*
 
 !mock/*.md

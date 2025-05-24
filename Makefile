@@ -8,6 +8,7 @@ PORT=8080
 
 APP_DIR=/app
 
+
 start_docker: 
 	@docker-compose --progress quiet up -d --no-build --quiet-pull
 
@@ -21,4 +22,4 @@ generate:
 
 test: generate
 	@echo 'generating'
-	@make docker-run CMD='go test ./...'
+	@make docker-run CMD='go test -coverprofile=coverage.out ./... ; go tool cover -func=coverage.out; go tool cover -html=coverage.out -o coverage.html'
