@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	config "github.com/ydoro/wishlist/config/customer"
+	"github.com/ydoro/wishlist/config"
 	"github.com/ydoro/wishlist/internal/infra/adapter"
 	postgresDB "github.com/ydoro/wishlist/internal/infra/db/postgres"
 	"github.com/ydoro/wishlist/internal/infra/delivery/http"
