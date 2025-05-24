@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	e "github.com/ydoro/wishlist/pkg/wishlist/presentation/errors"
+	"github.com/stretchr/testify/assert"
+	e "github.com/ydoro/wishlist/pkg/presentation/errors"
 )
 
 func TestIsAuthenticationError(t *testing.T) {
@@ -15,7 +16,7 @@ func TestIsAuthenticationError(t *testing.T) {
 	}{
 		{
 			name: "isAuthenticationError",
-			err:  &e.AuthenticationError{},
+			err:  e.NewAuthenticationError("password"),
 			want: true,
 		},
 		{
@@ -35,6 +36,31 @@ func TestIsAuthenticationError(t *testing.T) {
 			if got := e.IsAuthenticationError(tt.err); got != tt.want {
 				t.Errorf("IsAuthenticationError() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestAuthErrorMessages(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{
+			name: "AuthenticationError message",
+			err:  e.NewAuthenticationError("password"),
+			want: "password authentication method",
+		},
+		{
+			name: "not AuthenticationError",
+			err:  fmt.Errorf("some other error"),
+			want: "some other error",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Contains(t, tt.err.Error(), tt.want)
 		})
 	}
 }

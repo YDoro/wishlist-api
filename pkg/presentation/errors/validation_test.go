@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	e "github.com/ydoro/wishlist/pkg/wishlist/presentation/errors"
+	"github.com/stretchr/testify/assert"
+	e "github.com/ydoro/wishlist/pkg/presentation/errors"
 )
 
 func TestIsValidationError(t *testing.T) {
@@ -15,7 +16,7 @@ func TestIsValidationError(t *testing.T) {
 	}{
 		{
 			name: "ValidationError",
-			err:  &e.ValidationError{},
+			err:  e.NewRequiredFieldError("email"),
 			want: true,
 		},
 		{
@@ -35,6 +36,31 @@ func TestIsValidationError(t *testing.T) {
 			if got := e.IsValidationError(tt.err); got != tt.want {
 				t.Errorf("IsValidationError() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestValidationErrorMessages(t *testing.T) {
+	tests := []struct {
+		name string
+		err  error
+		want string
+	}{
+		{
+			name: "ValidationError",
+			err:  e.NewRequiredFieldError("email"),
+			want: "'email' is required",
+		},
+		{
+			name: "not ValidationError",
+			err:  fmt.Errorf("some other error"),
+			want: "some other error",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Contains(t, tt.err.Error(), tt.want)
 		})
 	}
 }
