@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	AppPort string
-	DBHost  string
-	DBPort  string
-	DBUser  string
-	DBPass  string
-	DBName  string
-	DBSSL   string
+	AppPort   string
+	DBHost    string
+	DBPort    string
+	DBUser    string
+	DBPass    string
+	DBName    string
+	DBSSL     string
+	JWTSecret string
 }
 
 func LoadConfig() *Config {
@@ -25,13 +26,14 @@ func LoadConfig() *Config {
 	viper.SetDefault("DB_SSL", "false")
 
 	return &Config{
-		AppPort: getEnv("APP_PORT"),
-		DBHost:  getEnv("DB_HOST"),
-		DBPort:  getEnv("DB_PORT"),
-		DBUser:  getEnv("DB_USER"),
-		DBPass:  getEnv("DB_PASSWORD"),
-		DBName:  getEnv("DB_NAME"),
-		DBSSL:   getEnv("DB_SSL"),
+		AppPort:   getEnv("APP_PORT"),
+		DBHost:    getEnv("DB_HOST"),
+		DBPort:    getEnv("DB_PORT"),
+		DBUser:    getEnv("DB_USER"),
+		DBPass:    getEnv("DB_PASSWORD"),
+		DBName:    getEnv("DB_NAME"),
+		DBSSL:     getEnv("DB_SSL"),
+		JWTSecret: getEnv("JWT_SECRET"),
 	}
 }
 
