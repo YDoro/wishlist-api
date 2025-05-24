@@ -18,8 +18,8 @@ func NewCustomerRepository(db *sql.DB) *customerRepo {
 }
 
 func (r *customerRepo) Create(ctx context.Context, customer *domain.Customer) error {
-	query := `INSERT INTO customers (id, name, email) VALUES ($1, $2, $3)`
-	_, err := r.DB.ExecContext(ctx, query, customer.ID, customer.Name, customer.Email)
+	query := `INSERT INTO customers (id, name, email, password, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6)`
+	_, err := r.DB.ExecContext(ctx, query, customer.ID, customer.Name, customer.Email, customer.Password, customer.CreatedAt, customer.UpdatedAt)
 
 	return err
 }
