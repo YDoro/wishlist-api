@@ -34,7 +34,7 @@ func TestPasswordAuthenticationUseCase_Authenticate(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		credentials   inputs.PwdAuth
+		credentials   any // Changed from inputs.PwdAuth to any to test invalid types
 		setupMocks    func()
 		expectedToken string
 		expectedError error
@@ -129,6 +129,16 @@ func TestPasswordAuthenticationUseCase_Authenticate(t *testing.T) {
 			expectedToken: "",
 			expectedError: errors.New("encryption failed"),
 		},
+		{
+			name:          "invalid credentials type",
+			credentials:   struct{ foo string }{"bar"},
+			setupMocks:    func() {},
+			expectedToken: "",
+			expectedError: &e.ValidationError{
+				Field: "credentials",
+				Err:   "Invalid credentials type",
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -146,6 +156,13 @@ func TestPasswordAuthenticationUseCase_Authenticate(t *testing.T) {
 			if tt.expectedError != nil {
 				assert.Error(t, err)
 				assert.Equal(t, tt.expectedError.Error(), err.Error())
+
+				if validationErr, ok := tt.expectedError.(*e.ValidationError); ok {
+					assert.True(t, e.IsValidationError(err))
+					actualErr, _ := err.(*e.ValidationError)
+					assert.Equal(t, validationErr.Field, actualErr.Field)
+					assert.Equal(t, validationErr.Err, actualErr.Err)
+				}
 			} else {
 				assert.NoError(t, err)
 			}
