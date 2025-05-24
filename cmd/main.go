@@ -9,6 +9,8 @@ import (
 	postgresDB "github.com/ydoro/wishlist/internal/infra/db/postgres"
 	"github.com/ydoro/wishlist/internal/infra/delivery/http"
 	"github.com/ydoro/wishlist/internal/usecase"
+
+	_ "github.com/ydoro/wishlist/docs" // for swagger
 )
 
 // @title Wishlist API GO
