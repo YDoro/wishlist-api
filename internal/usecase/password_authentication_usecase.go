@@ -47,7 +47,12 @@ func (p *PasswordAuthenticationUseCase) Authenticate(ctx context.Context, creden
 		return "", e.NewAuthenticationError(domain.AuthMethodPassword)
 	}
 	// if the password matches, sign a JWT token and return it
-	data, _ := json.Marshal(user)
+	outgoing := &domain.OutgoingCustomer{
+		ID:    user.ID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
+	data, _ := json.Marshal(outgoing)
 	token, err := p.Encrypter.Encrypt(string(data))
 
 	if err != nil {

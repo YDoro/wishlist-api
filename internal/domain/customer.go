@@ -23,10 +23,20 @@ type IncommingCustomer struct {
 	Password string `json:"password"`
 }
 
-// Usecases
+type OutgoingCustomer struct {
+	ID        string    `json:"id"`
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+}
 
+// Usecases
 type CreateCustomerUC interface {
 	CreateCustomerWithEmail(ctx context.Context, data IncommingCustomer) (string, error)
+}
+
+type ShowCustomerDataUC interface {
+	ShowCustomerData(ctx context.Context, authToken string, id string) (*OutgoingCustomer, error)
 }
 
 // repositories

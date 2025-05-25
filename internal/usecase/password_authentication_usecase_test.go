@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ydoro/wishlist/internal/domain"
@@ -24,13 +25,19 @@ func TestPasswordAuthenticationUseCase_Authenticate(t *testing.T) {
 	mockEncrypter := mocks.NewMockEncrypter(ctrl)
 
 	testUser := &domain.Customer{
-		ID:       "user123",
-		Email:    "test@example.com",
-		Password: "hashedPassword",
-		Name:     "Test User",
+		ID:        "user123",
+		Email:     "test@example.com",
+		Name:      "Test User",
+		Password:  "hashedPassword",
+		CreatedAt: time.Now(),
 	}
 
-	testUserJSON, _ := json.Marshal(testUser)
+	expectedOutgoing := &domain.OutgoingCustomer{
+		ID:    testUser.ID,
+		Name:  testUser.Name,
+		Email: testUser.Email,
+	}
+	expectedOutgoingJSON, _ := json.Marshal(expectedOutgoing)
 
 	tests := []struct {
 		name          string
@@ -55,7 +62,7 @@ func TestPasswordAuthenticationUseCase_Authenticate(t *testing.T) {
 					Return(nil)
 
 				mockEncrypter.EXPECT().
-					Encrypt(string(testUserJSON)).
+					Encrypt(string(expectedOutgoingJSON)).
 					Return("valid.jwt.token", nil)
 			},
 			expectedToken: "valid.jwt.token",
@@ -123,7 +130,7 @@ func TestPasswordAuthenticationUseCase_Authenticate(t *testing.T) {
 					Return(nil)
 
 				mockEncrypter.EXPECT().
-					Encrypt(string(testUserJSON)).
+					Encrypt(string(expectedOutgoingJSON)).
 					Return("", errors.New("encryption failed"))
 			},
 			expectedToken: "",
