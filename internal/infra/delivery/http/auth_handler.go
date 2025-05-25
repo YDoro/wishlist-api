@@ -22,7 +22,7 @@ type AuthHandler struct {
 // @Failure 401 {object} outputs.ErrorResponse
 // @Failure 400 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/login [post]
+// @Router /api/auth/login [post]
 func (h *AuthHandler) PasswordAuthentication(c *gin.Context) {
 	var credentials inputs.PwdAuth
 
@@ -49,5 +49,5 @@ func NewAuthHandler(r *gin.RouterGroup, uc domain.Authenticator) {
 	}
 
 	authRoutes := r.Group("/auth")
-	authRoutes.POST("/", handler.PasswordAuthentication)
+	authRoutes.POST("/login", handler.PasswordAuthentication)
 }

@@ -56,36 +56,7 @@ info:
   title: Wishlist API GO
   version: "1.0"
 paths:
-  /api/customers:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: Client data
-        in: body
-        name: customer
-        required: true
-        schema:
-          $ref: '#/definitions/inputs.CreateCustomerRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/domain.Customer'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/outputs.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/outputs.ErrorResponse'
-      summary: Creates a new customer
-      tags:
-      - customers
-  /api/login:
+  /api/auth/login:
     post:
       consumes:
       - application/json
@@ -118,4 +89,33 @@ paths:
       summary: Authenticate user
       tags:
       - auth
+  /api/customers:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Client data
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.CreateCustomerRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Customer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: Creates a new customer
+      tags:
+      - customers
 swagger: "2.0"
