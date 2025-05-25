@@ -12,7 +12,7 @@ APP_DIR=/app
 start_docker: 
 	@docker-compose --progress quiet up -d --no-build --quiet-pull
 
-docker-run: start_docker
+docker-run: start_dev
 	@docker exec -it $(APP_NAME) sh -c "$(CMD)"
 
 generate:
@@ -23,3 +23,20 @@ generate:
 test: generate
 	@echo 'generating'
 	@make docker-run CMD='go test -coverprofile=coverage.out ./... ; go tool cover -func=coverage.out; go tool cover -html=coverage.out -o coverage.html'
+
+stop:
+	@docker-compose --progress quiet down
+
+start-dev:
+	@if [ -f .env ]; then \
+		sed -i '/^ENV=/d' .env; \
+	fi
+	@echo "ENV=dev" >> .env
+	@docker compose up --build
+
+start:
+	@if [ -f .env ]; then \
+		sed -i '/^ENV=/d' .env; \
+	fi
+	@echo "ENV=prod" >> .env
+	@docker compose --progress quiet up --build

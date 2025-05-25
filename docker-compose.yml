@@ -1,7 +1,9 @@
 services:
   customer-api:
     container_name: customer-api
-    build: .
+    build:
+      context: .
+      target: ${ENV}
     ports:
       - "8080:8080"
     depends_on:
@@ -9,13 +11,12 @@ services:
       - migrate
     env_file:
       - .env
-    command: ["air"]
     volumes:
       - .:/app
   migrate:
     container_name: migrate
     build: .
-    command: ["migrate", "-path", "internal/infra/db/postgres/migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}", "up"] 
+    command: ["migrate", "-path", "./migrations", "-database", "postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?sslmode=${DB_SSL}", "up"] 
     depends_on:
       - postgres
   postgres:
