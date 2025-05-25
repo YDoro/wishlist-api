@@ -17,7 +17,7 @@ import (
 // @version 1.0
 // @description A powerful API for managing customers wishlists.
 // @host localhost:8080
-// @BasePath /api/v1
+// @BasePath /api/
 func main() {
 	cfg := config.LoadConfig()
 	r := gin.Default()
