@@ -42,7 +42,7 @@ generate:
 
 test: generate
 	@echo 'generating'
-	@make docker-run CMD='go test -coverprofile=coverage.out ./... ; go tool cover -func=coverage.out; go tool cover -html=coverage.out -o coverage.html'
+	@make docker-run CMD='go test -coverprofile=coverage.out ./internal/... ; go tool cover -func=coverage.out; go tool cover -html=coverage.out -o coverage.html'
 
 docsx:
 	@echo 'generating docs ...'
