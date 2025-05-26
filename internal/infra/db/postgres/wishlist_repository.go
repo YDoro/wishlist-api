@@ -29,7 +29,7 @@ func (r *wishlistRepo) GetById(ctx context.Context, wishlistId string) (*domain.
 	row := r.DB.QueryRowContext(ctx, query, wishlistId)
 
 	wishlist := &domain.Wishlist{}
-	err := row.Scan(&wishlist.ID, &wishlist.CustomerId, &wishlist.Title, &wishlist.Items)
+	err := row.Scan(&wishlist.ID, &wishlist.CustomerId, &wishlist.Title, pq.Array(&wishlist.Items))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -45,7 +45,7 @@ func (r *wishlistRepo) GetByTitle(ctx context.Context, customerId string, title 
 	row := r.DB.QueryRowContext(ctx, query, customerId, title)
 
 	wishlist := &domain.Wishlist{}
-	err := row.Scan(&wishlist.ID, &wishlist.CustomerId, &wishlist.Title, &wishlist.Items)
+	err := row.Scan(&wishlist.ID, &wishlist.CustomerId, &wishlist.Title, pq.Array(&wishlist.Items))
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
@@ -67,7 +67,7 @@ func (r *wishlistRepo) GetByCustomerId(ctx context.Context, customerId string) (
 	var wishlists []*domain.Wishlist
 	for rows.Next() {
 		wishlist := &domain.Wishlist{}
-		err := rows.Scan(&wishlist.ID, &wishlist.CustomerId, &wishlist.Title, &wishlist.Items)
+		err := rows.Scan(&wishlist.ID, &wishlist.CustomerId, &wishlist.Title, pq.Array(&wishlist.Items))
 		if err != nil {
 			return nil, err
 		}
