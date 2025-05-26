@@ -48,11 +48,13 @@ func main() {
 	hasher := adapter.NewPasswordHasher(10)
 	jwtEcnoder := adapter.NewJWTEncrypter(cfg.JWTSecret)
 
+	authMiddleware := middleware.NewAuthMiddleware(jwtEcnoder)
+
 	ucs := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
 	showCustomerUC := usecase.NewGetCustomerData(customerRepo)
 	authUC := usecase.NewPasswordAuthenticationUseCase(hasher, customerRepo, jwtEcnoder)
-	authMiddleware := middleware.NewAuthMiddleware(jwtEcnoder)
+	updateCustomerUc := usecase.NewUpdateCustomerUseCase(customerRepo, customerRepo, customerRepo)
 
-	router := http.SetupRoutes(r, ucs, authUC, authMiddleware.Handle, showCustomerUC)
+	router := http.SetupRoutes(r, ucs, authUC, authMiddleware.Handle, showCustomerUC, updateCustomerUc)
 	router.Run(":8080")
 }

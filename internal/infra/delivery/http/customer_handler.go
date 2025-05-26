@@ -14,6 +14,7 @@ import (
 type CunstomerHandler struct {
 	createCustomerUC domain.CreateCustomerUC
 	showcustomerUC   domain.ShowCustomerDataUC
+	updatecustomerUC domain.UpdateCustomerUC
 }
 
 func NewCustomerHandler(
@@ -21,14 +22,17 @@ func NewCustomerHandler(
 	uc domain.CreateCustomerUC,
 	auth gin.HandlerFunc,
 	showCustomeruc domain.ShowCustomerDataUC,
+	updateCustomerUC domain.UpdateCustomerUC,
 ) {
 	handler := &CunstomerHandler{
 		createCustomerUC: uc,
 		showcustomerUC:   showCustomeruc,
+		updatecustomerUC: updateCustomerUC,
 	}
 
 	customerRoutes := r.Group("/customers")
 	customerRoutes.GET("/:id", auth, handler.ShowCustomerData)
+	customerRoutes.PATCH("/:id", auth, handler.UpdateCustomer)
 	customerRoutes.POST("/", handler.CreateCustomer)
 
 }
@@ -78,11 +82,12 @@ func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 // @Tags customers
 // @Produce json
 // @Security BearerAuth
+// @Param id path string true "Customer ID"
 // @Success 200 {object} domain.OutgoingCustomer
 // @Failure 400 {object} outputs.ErrorResponse
 // @Failure 401 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/customers [get]
+// @Router /api/customers/{id} [get]
 func (h *CunstomerHandler) ShowCustomerData(c *gin.Context) {
 	id := c.Param("id")
 
@@ -98,6 +103,55 @@ func (h *CunstomerHandler) ShowCustomerData(c *gin.Context) {
 	json.Unmarshal([]byte(str.(string)), &customer)
 
 	res, err := h.showcustomerUC.ShowCustomerData(c, customer.ID, id)
+
+	if err != nil {
+		if e.IsUnauthorizedError(err) {
+			c.JSON(401, outputs.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+		c.JSON(500, gin.H{"error": "Failed to get customer"})
+		return
+	}
+	c.JSON(200, res)
+}
+
+// UpdateCustomer godoc
+// @Summary updates the given customer
+// @Tags customers
+// @Accept json
+// @Produce json
+// @Param customer body domain.CustomerEditableFields true "Data to update, either name or email or both"
+// @Security BearerAuth
+// @Param id path string true "Customer ID"
+// @Success 200 {object} domain.OutgoingCustomer
+// @Failure 400 {object} outputs.ErrorResponse
+// @Failure 401 {object} outputs.ErrorResponse
+// @Failure 500 {object} outputs.ErrorResponse
+// @Router /api/customers/{id} [patch]
+func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(400, outputs.ErrorResponse{
+			Message: "Invalid input"})
+		return
+	}
+
+	var currentCustomer domain.OutgoingCustomer
+
+	str, _ := c.Get("currentCustomer")
+	json.Unmarshal([]byte(str.(string)), &currentCustomer)
+
+	var data domain.CustomerEditableFields
+	if err := c.ShouldBindJSON(&data); err != nil {
+		c.JSON(400, outputs.ErrorResponse{
+			Message: "Invalid input"})
+		return
+	}
+
+	res, err := h.updatecustomerUC.UpdateCustomer(c, currentCustomer.ID, id, data)
 
 	if err != nil {
 		if e.IsUnauthorizedError(err) {
