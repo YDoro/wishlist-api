@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ydoro/wishlist/internal/domain"
@@ -87,7 +86,6 @@ func (h WishlistHandler) CreateWishList(c *gin.Context) {
 			return
 		}
 
-		log.Fatalf("Error creating wishlist: %v", err)
 		c.JSON(500, outputs.ErrorResponse{
 			Message: "Internal server error",
 		})
