@@ -1,4 +1,4 @@
-//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,ShowCustomerDataUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository,UpdateCustomerUC,UpdateCustomerRepository
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,ShowCustomerDataUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository,UpdateCustomerUC,UpdateCustomerRepository,DeleteCustomerUC
 
 package domain
 
@@ -48,6 +48,10 @@ type ShowCustomerDataUC interface {
 
 type UpdateCustomerUC interface {
 	UpdateCustomer(ctx context.Context, currentCustomerID string, customerID string, data CustomerEditableFields) (*OutgoingCustomer, error)
+}
+
+type DeleteCustomerUC interface {
+	DeleteCustomer(ctx context.Context, currentCustomerID string, customerID string) error
 }
 
 // repositories

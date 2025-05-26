@@ -15,6 +15,7 @@ type CunstomerHandler struct {
 	createCustomerUC domain.CreateCustomerUC
 	showcustomerUC   domain.ShowCustomerDataUC
 	updatecustomerUC domain.UpdateCustomerUC
+	deleteCustomerUC domain.DeleteCustomerUC
 }
 
 func NewCustomerHandler(
@@ -23,16 +24,19 @@ func NewCustomerHandler(
 	auth gin.HandlerFunc,
 	showCustomeruc domain.ShowCustomerDataUC,
 	updateCustomerUC domain.UpdateCustomerUC,
+	deleteCustomerUC domain.DeleteCustomerUC,
 ) {
 	handler := &CunstomerHandler{
 		createCustomerUC: uc,
 		showcustomerUC:   showCustomeruc,
 		updatecustomerUC: updateCustomerUC,
+		deleteCustomerUC: deleteCustomerUC,
 	}
 
 	customerRoutes := r.Group("/customers")
 	customerRoutes.GET("/:id", auth, handler.ShowCustomerData)
 	customerRoutes.PATCH("/:id", auth, handler.UpdateCustomer)
+	customerRoutes.DELETE("/:id", auth, handler.DeleteCustomer)
 	customerRoutes.POST("/", handler.CreateCustomer)
 
 }
@@ -164,4 +168,53 @@ func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
 		return
 	}
 	c.JSON(200, res)
+}
+
+// DeleteCustomer godoc
+// @Summary Deletes the given customer
+// @Tags customers
+// @Produce json
+// @Security BearerAuth
+// @Param id path string true "Customer ID"
+// @Success 204
+// @Failure 400 {object} outputs.ErrorResponse
+// @Failure 401 {object} outputs.ErrorResponse
+// @Failure 404 {object} outputs.ErrorResponse
+// @Failure 500 {object} outputs.ErrorResponse
+// @Router /api/customers/{id} [delete]
+func (h *CunstomerHandler) DeleteCustomer(c *gin.Context) {
+	id := c.Param("id")
+
+	if id == "" {
+		c.JSON(400, outputs.ErrorResponse{
+			Message: "Invalid input"})
+		return
+	}
+
+	var currentCustomer domain.OutgoingCustomer
+
+	str, _ := c.Get("currentCustomer")
+	json.Unmarshal([]byte(str.(string)), &currentCustomer)
+
+	err := h.deleteCustomerUC.DeleteCustomer(c, currentCustomer.ID, id)
+
+	if err != nil {
+		switch {
+		case e.IsUnauthorizedError(err):
+			c.JSON(401, outputs.ErrorResponse{
+				Message: err.Error(),
+			})
+		case e.IsNotFoundError(err):
+			c.JSON(404, outputs.ErrorResponse{
+				Message: err.Error(),
+			})
+		default:
+			c.JSON(500, outputs.ErrorResponse{
+				Message: "Failed to delete customer",
+			})
+		}
+		return
+	}
+
+	c.Status(204)
 }

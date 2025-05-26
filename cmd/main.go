@@ -54,7 +54,8 @@ func main() {
 	showCustomerUC := usecase.NewGetCustomerData(customerRepo)
 	authUC := usecase.NewPasswordAuthenticationUseCase(hasher, customerRepo, jwtEcnoder)
 	updateCustomerUc := usecase.NewUpdateCustomerUseCase(customerRepo, customerRepo, customerRepo)
+	deleteCustomerUc := usecase.NewDeleteCustomerUseCase(customerRepo, customerRepo)
 
-	router := http.SetupRoutes(r, ucs, authUC, authMiddleware.Handle, showCustomerUC, updateCustomerUc)
+	router := http.SetupRoutes(r, ucs, authUC, authMiddleware.Handle, showCustomerUC, updateCustomerUc, deleteCustomerUc)
 	router.Run(":8080")
 }

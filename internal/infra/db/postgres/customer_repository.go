@@ -25,7 +25,7 @@ func (r *customerRepo) Create(ctx context.Context, customer *domain.Customer) er
 }
 
 func (r *customerRepo) GetByEmail(ctx context.Context, email string) (*domain.Customer, error) {
-	query := `SELECT id, name, email, password, created_at, updated_at FROM customers WHERE email = $1`
+	query := `SELECT id, name, email, password, created_at, updated_at FROM customers WHERE email = $1 AND deleted_at IS NULL`
 	row := r.DB.QueryRowContext(ctx, query, email)
 
 	customer := &domain.Customer{}
@@ -41,7 +41,7 @@ func (r *customerRepo) GetByEmail(ctx context.Context, email string) (*domain.Cu
 }
 
 func (r *customerRepo) GetByID(ctx context.Context, id string) (*domain.Customer, error) {
-	query := `SELECT id, name, email, password, created_at, updated_at FROM customers WHERE id = $1`
+	query := `SELECT id, name, email, password, created_at, updated_at FROM customers WHERE id = $1 AND deleted_at IS NULL`
 	row := r.DB.QueryRowContext(ctx, query, id)
 
 	customer := &domain.Customer{}

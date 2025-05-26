@@ -14,11 +14,12 @@ func SetupRoutes(
 	authMiddleware gin.HandlerFunc,
 	customerGetter domain.ShowCustomerDataUC,
 	customerUpdater domain.UpdateCustomerUC,
+	customerDeleter domain.DeleteCustomerUC,
 ) *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
-	NewCustomerHandler(api, customerCreation, authMiddleware, customerGetter, customerUpdater)
+	NewCustomerHandler(api, customerCreation, authMiddleware, customerGetter, customerUpdater, customerDeleter)
 	NewAuthHandler(api, userAuthentication)
 
 	return r
