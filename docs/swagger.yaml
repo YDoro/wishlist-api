@@ -288,6 +288,53 @@ paths:
       summary: Creates a new wishlist
       tags:
       - wishlists
+  /api/customers/{customerId}/wishlists/{wishListId}:
+    patch:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      - description: Wishlist ID
+        in: path
+        name: wishListId
+        required: true
+        type: string
+      - description: Wishlist data
+        in: body
+        name: wishlist
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.CreateWishlistInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/outputs.CreateWishlistResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: Renames an existing wishlist
+      tags:
+      - wishlists
 securityDefinitions:
   BearerAuth:
     in: Header
