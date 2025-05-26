@@ -189,8 +189,8 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 				mockWishlistGetter,
 				mockWishlistCreator,
 				mockCustomerGetter,
+				mockIDGen,
 			)
-			uc.IdMaker = mockIDGen
 
 			id, err := uc.CreateWishlist(context.Background(), tt.currentCustomerID, tt.customerID, tt.title)
 
