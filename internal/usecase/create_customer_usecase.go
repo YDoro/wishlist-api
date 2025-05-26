@@ -24,6 +24,7 @@ func NewCreateCustomerUseCase(customerRepository domain.CustomerCreationReposito
 }
 
 func (uc *CreateCustomerUseCase) CreateCustomerWithEmail(ctx context.Context, data domain.IncommingCustomer) (string, error) {
+	// TODO - check if the email already exists to avoid 500 error
 	if data.Password == "" {
 		return "", e.NewRequiredFieldError("password")
 	}
