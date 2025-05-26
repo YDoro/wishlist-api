@@ -7,11 +7,17 @@ import (
 	"github.com/ydoro/wishlist/internal/domain"
 )
 
-func SetupRoutes(r *gin.Engine, customerCreation domain.CreateCustomerUC, userAuthentication domain.Authenticator) *gin.Engine {
+func SetupRoutes(
+	r *gin.Engine,
+	customerCreation domain.CreateCustomerUC,
+	userAuthentication domain.Authenticator,
+	authMiddleware gin.HandlerFunc,
+	customerGetter domain.ShowCustomerDataUC,
+) *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	api := r.Group("/api")
-	NewCustomerHandler(api, customerCreation)
+	NewCustomerHandler(api, customerCreation, authMiddleware, customerGetter)
 	NewAuthHandler(api, userAuthentication)
 
 	return r

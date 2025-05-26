@@ -17,6 +17,17 @@ definitions:
       updated_at:
         type: string
     type: object
+  domain.OutgoingCustomer:
+    properties:
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
   inputs.CreateCustomerRequest:
     properties:
       email:
@@ -90,6 +101,31 @@ paths:
       tags:
       - auth
   /api/customers:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.OutgoingCustomer'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Gets given customer data by ID
+      tags:
+      - customers
     post:
       consumes:
       - application/json
@@ -118,4 +154,9 @@ paths:
       summary: Creates a new customer
       tags:
       - customers
+securityDefinitions:
+  BearerAuth:
+    in: Header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

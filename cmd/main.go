@@ -8,6 +8,7 @@ import (
 	"github.com/ydoro/wishlist/internal/infra/adapter"
 	postgresDB "github.com/ydoro/wishlist/internal/infra/db/postgres"
 	"github.com/ydoro/wishlist/internal/infra/delivery/http"
+	"github.com/ydoro/wishlist/internal/infra/delivery/http/middleware"
 	"github.com/ydoro/wishlist/internal/usecase"
 
 	_ "github.com/ydoro/wishlist/docs" // for swagger
@@ -18,6 +19,9 @@ import (
 // @description A powerful API for managing customers wishlists.
 // @host localhost:8080
 // @BasePath /api/
+// @securityDefinitions.apikey BearerAuth
+// @in Header
+// @name Authorization
 func main() {
 	cfg := config.LoadConfig()
 	r := gin.Default()
@@ -43,8 +47,12 @@ func main() {
 	idGenerator := adapter.UUIDGenerator{}
 	hasher := adapter.NewPasswordHasher(10)
 	jwtEcnoder := adapter.NewJWTEncrypter(cfg.JWTSecret)
+
 	ucs := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
+	showCustomerUC := usecase.NewGetCustomerData(customerRepo)
 	authUC := usecase.NewPasswordAuthenticationUseCase(hasher, customerRepo, jwtEcnoder)
-	router := http.SetupRoutes(r, ucs, authUC)
+	authMiddleware := middleware.NewAuthMiddleware(jwtEcnoder)
+
+	router := http.SetupRoutes(r, ucs, authUC, authMiddleware.Handle, showCustomerUC)
 	router.Run(":8080")
 }
