@@ -24,3 +24,22 @@ func (j *JWTEncrypter) Encrypt(plainText string) (string, error) {
 	}
 	return signedToken, nil
 }
+
+func (j *JWTEncrypter) Decrypt(cipherText string) (string, error) {
+	token, err := jwt.Parse(cipherText, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, jwt.NewValidationError("unexpected signing method", jwt.ValidationErrorSignatureInvalid)
+		}
+		return []byte(j.secret), nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims["data"].(string), nil
+	}
+
+	return "", jwt.NewValidationError("invalid token", jwt.ValidationErrorSignatureInvalid)
+}
