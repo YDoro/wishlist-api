@@ -1,4 +1,4 @@
-//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,ShowCustomerDataUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,ShowCustomerDataUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository,UpdateCustomerUC,UpdateCustomerRepository
 
 package domain
 
@@ -23,6 +23,13 @@ type IncommingCustomer struct {
 	Password string `json:"password"`
 }
 
+type CustomerEditableFields struct {
+	Name  string `json:"name"`
+	Email string `json:"email"`
+	// NOTE - Password is intentionally omitted here to prevent accidental updates
+	// TODO - Password changes should be handled separately
+}
+
 type OutgoingCustomer struct {
 	ID        string    `json:"id"`
 	Name      string    `json:"name"`
@@ -39,6 +46,10 @@ type ShowCustomerDataUC interface {
 	ShowCustomerData(ctx context.Context, currentCustomerid string, id string) (*OutgoingCustomer, error)
 }
 
+type UpdateCustomerUC interface {
+	UpdateCustomer(ctx context.Context, currentCustomerID string, customerID string, data CustomerEditableFields) (*OutgoingCustomer, error)
+}
+
 // repositories
 
 type CustomerCreationRepository interface {
@@ -52,4 +63,8 @@ type GetCustomerByEmailRepository interface {
 
 type GetCustomerByIDRepository interface {
 	GetByID(ctx context.Context, id string) (*Customer, error)
+}
+
+type UpdateCustomerRepository interface {
+	Update(ctx context.Context, customer *Customer) error
 }
