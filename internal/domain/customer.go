@@ -1,4 +1,4 @@
-//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/customer_mock.go -package=mocks . CreateCustomerUC,ShowCustomerDataUC,CustomerCreationRepository,GetCustomerByEmailRepository,GetCustomerByIDRepository
 
 package domain
 
@@ -36,7 +36,7 @@ type CreateCustomerUC interface {
 }
 
 type ShowCustomerDataUC interface {
-	ShowCustomerData(ctx context.Context, authToken string, id string) (*OutgoingCustomer, error)
+	ShowCustomerData(ctx context.Context, currentCustomerid string, id string) (*OutgoingCustomer, error)
 }
 
 // repositories
