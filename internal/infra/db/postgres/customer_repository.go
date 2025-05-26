@@ -55,3 +55,36 @@ func (r *customerRepo) GetByID(ctx context.Context, id string) (*domain.Customer
 
 	return customer, nil
 }
+
+func (r *customerRepo) Update(ctx context.Context, customer *domain.Customer) error {
+	query := `UPDATE customers 
+		SET name = $1, 
+			email = $2, 
+			updated_at = $3, 
+			deleted_at = $4 
+		WHERE id = $5`
+
+	result, err := r.DB.ExecContext(
+		ctx,
+		query,
+		customer.Name,
+		customer.Email,
+		customer.UpdatedAt,
+		customer.DeletedAt,
+		customer.ID,
+	)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
