@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 )
 
 type DeleteCustomerUseCase struct {

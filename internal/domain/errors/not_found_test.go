@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/ydoro/wishlist/internal/presentation/errors"
+	"github.com/ydoro/wishlist/internal/domain/errors"
 )
 
 func TestNotFoundError(t *testing.T) {

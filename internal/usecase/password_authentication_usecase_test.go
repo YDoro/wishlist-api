@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/inputs"
 	"github.com/ydoro/wishlist/internal/usecase"
 	mocks "github.com/ydoro/wishlist/mock/domain"

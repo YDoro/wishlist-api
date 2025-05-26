@@ -3,7 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/inputs"
 	"github.com/ydoro/wishlist/internal/presentation/outputs"
 )

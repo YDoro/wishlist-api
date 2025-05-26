@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 )
 
 func TestIsAuthenticationError(t *testing.T) {

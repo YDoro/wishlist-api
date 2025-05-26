@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/presentation/errors"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/inputs"
 )
 
