@@ -111,7 +111,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/customers/{id}": {
+        "/api/customers/{customerId}": {
             "get": {
                 "security": [
                     {
@@ -129,7 +129,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Customer ID",
-                        "name": "id",
+                        "name": "customerId",
                         "in": "path",
                         "required": true
                     }
@@ -178,7 +178,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Customer ID",
-                        "name": "id",
+                        "name": "customerId",
                         "in": "path",
                         "required": true
                     }
@@ -242,7 +242,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Customer ID",
-                        "name": "id",
+                        "name": "customerId",
                         "in": "path",
                         "required": true
                     }
@@ -252,6 +252,64 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/domain.OutgoingCustomer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customers/{customerId}/wishlists": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wishlists"
+                ],
+                "summary": "Creates a new wishlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Customer ID",
+                        "name": "customer",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Wishlist data",
+                        "name": "wishlist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/inputs.CreateWishlistInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.CreateWishlistResponse"
                         }
                     },
                     "400": {
@@ -349,6 +407,14 @@ const docTemplate = `{
                 }
             }
         },
+        "inputs.CreateWishlistInput": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "inputs.PwdAuth": {
             "type": "object",
             "required": [
@@ -368,6 +434,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "outputs.CreateWishlistResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
                     "type": "string"
                 }
             }
@@ -394,7 +468,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/api/",
+	BasePath:         "/",
 	Schemes:          []string{},
 	Title:            "Wishlist API GO",
 	Description:      "A powerful API for managing customers wishlists.",

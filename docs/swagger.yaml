@@ -1,4 +1,4 @@
-basePath: /api/
+basePath: /
 definitions:
   domain.Customer:
     properties:
@@ -47,6 +47,11 @@ definitions:
     - email
     - name
     type: object
+  inputs.CreateWishlistInput:
+    properties:
+      title:
+        type: string
+    type: object
   inputs.PwdAuth:
     properties:
       email:
@@ -60,6 +65,11 @@ definitions:
   outputs.AuthSuccessResponse:
     properties:
       token:
+        type: string
+    type: object
+  outputs.CreateWishlistResponse:
+    properties:
+      id:
         type: string
     type: object
   outputs.ErrorResponse:
@@ -136,12 +146,12 @@ paths:
       summary: Creates a new customer
       tags:
       - customers
-  /api/customers/{id}:
+  /api/customers/{customerId}:
     delete:
       parameters:
       - description: Customer ID
         in: path
-        name: id
+        name: customerId
         required: true
         type: string
       produces:
@@ -174,7 +184,7 @@ paths:
       parameters:
       - description: Customer ID
         in: path
-        name: id
+        name: customerId
         required: true
         type: string
       produces:
@@ -213,7 +223,7 @@ paths:
           $ref: '#/definitions/domain.CustomerEditableFields'
       - description: Customer ID
         in: path
-        name: id
+        name: customerId
         required: true
         type: string
       produces:
@@ -240,6 +250,44 @@ paths:
       summary: updates the given customer
       tags:
       - customers
+  /api/customers/{customerId}/wishlists:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customer
+        required: true
+        type: string
+      - description: Wishlist data
+        in: body
+        name: wishlist
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.CreateWishlistInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/outputs.CreateWishlistResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: Creates a new wishlist
+      tags:
+      - wishlists
 securityDefinitions:
   BearerAuth:
     in: Header
