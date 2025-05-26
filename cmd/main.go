@@ -18,7 +18,7 @@ import (
 // @version 1.0
 // @description A powerful API for managing customers wishlists.
 // @host localhost:8080
-// @BasePath /api/
+// @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
@@ -26,7 +26,6 @@ func main() {
 	cfg := config.LoadConfig()
 	r := gin.Default()
 
-	// here we can use some DI framework or some factory to create the use cases
 	conn, err := postgresDB.Connect(
 		cfg.DBHost,
 		cfg.DBPort,
@@ -40,22 +39,36 @@ func main() {
 		fmt.Println("Failed to connect to the database:", err)
 		return
 	}
-
 	defer conn.Close()
 
+	// TODO - improve DI, use a factory or a DI framework
 	customerRepo := postgresDB.NewCustomerRepository(conn)
+	wishlistRepo := postgresDB.NewWishlistRepository(conn)
 	idGenerator := adapter.UUIDGenerator{}
 	hasher := adapter.NewPasswordHasher(10)
 	jwtEcnoder := adapter.NewJWTEncrypter(cfg.JWTSecret)
 
 	authMiddleware := middleware.NewAuthMiddleware(jwtEcnoder)
 
-	ucs := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
-	showCustomerUC := usecase.NewGetCustomerData(customerRepo)
 	authUC := usecase.NewPasswordAuthenticationUseCase(hasher, customerRepo, jwtEcnoder)
+
+	createCustomerUC := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
+	showCustomerUC := usecase.NewGetCustomerData(customerRepo)
 	updateCustomerUc := usecase.NewUpdateCustomerUseCase(customerRepo, customerRepo, customerRepo)
 	deleteCustomerUc := usecase.NewDeleteCustomerUseCase(customerRepo, customerRepo)
 
-	router := http.SetupRoutes(r, ucs, authUC, authMiddleware.Handle, showCustomerUC, updateCustomerUc, deleteCustomerUc)
+	createWishlistUc := usecase.NewCreateWishlistUseCase(wishlistRepo, wishlistRepo, customerRepo, idGenerator)
+
+	router := http.SetupRoutes(
+		r,
+		createCustomerUC,
+		authUC,
+		authMiddleware.Handle,
+		showCustomerUC,
+		updateCustomerUc,
+		deleteCustomerUc,
+		createWishlistUc,
+	)
+
 	router.Run(":8080")
 }

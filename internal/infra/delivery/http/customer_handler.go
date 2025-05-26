@@ -25,7 +25,7 @@ func NewCustomerHandler(
 	showCustomeruc domain.ShowCustomerDataUC,
 	updateCustomerUC domain.UpdateCustomerUC,
 	deleteCustomerUC domain.DeleteCustomerUC,
-) {
+) *gin.RouterGroup {
 	handler := &CunstomerHandler{
 		createCustomerUC: uc,
 		showcustomerUC:   showCustomeruc,
@@ -34,10 +34,12 @@ func NewCustomerHandler(
 	}
 
 	customerRoutes := r.Group("/customers")
-	customerRoutes.GET("/:id", auth, handler.ShowCustomerData)
-	customerRoutes.PATCH("/:id", auth, handler.UpdateCustomer)
-	customerRoutes.DELETE("/:id", auth, handler.DeleteCustomer)
 	customerRoutes.POST("/", handler.CreateCustomer)
+	customerRoutes.GET("/:customerId", auth, handler.ShowCustomerData)
+	customerRoutes.PATCH("/:customerId", auth, handler.UpdateCustomer)
+	customerRoutes.DELETE("/:customerId", auth, handler.DeleteCustomer)
+
+	return customerRoutes
 
 }
 
@@ -86,14 +88,14 @@ func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 // @Tags customers
 // @Produce json
 // @Security BearerAuth
-// @Param id path string true "Customer ID"
+// @Param customerId path string true "Customer ID"
 // @Success 200 {object} domain.OutgoingCustomer
 // @Failure 400 {object} outputs.ErrorResponse
 // @Failure 401 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/customers/{id} [get]
+// @Router /api/customers/{customerId} [get]
 func (h *CunstomerHandler) ShowCustomerData(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("customerId")
 
 	if id == "" {
 		c.JSON(400, outputs.ErrorResponse{
@@ -128,14 +130,14 @@ func (h *CunstomerHandler) ShowCustomerData(c *gin.Context) {
 // @Produce json
 // @Param customer body domain.CustomerEditableFields true "Data to update, either name or email or both"
 // @Security BearerAuth
-// @Param id path string true "Customer ID"
+// @Param customerId path string true "Customer ID"
 // @Success 200 {object} domain.OutgoingCustomer
 // @Failure 400 {object} outputs.ErrorResponse
 // @Failure 401 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/customers/{id} [patch]
+// @Router /api/customers/{customerId} [patch]
 func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("customerId")
 
 	if id == "" {
 		c.JSON(400, outputs.ErrorResponse{
@@ -175,15 +177,15 @@ func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
 // @Tags customers
 // @Produce json
 // @Security BearerAuth
-// @Param id path string true "Customer ID"
+// @Param customerId path string true "Customer ID"
 // @Success 204
 // @Failure 400 {object} outputs.ErrorResponse
 // @Failure 401 {object} outputs.ErrorResponse
 // @Failure 404 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/customers/{id} [delete]
+// @Router /api/customers/{customerId} [delete]
 func (h *CunstomerHandler) DeleteCustomer(c *gin.Context) {
-	id := c.Param("id")
+	id := c.Param("customerId")
 
 	if id == "" {
 		c.JSON(400, outputs.ErrorResponse{

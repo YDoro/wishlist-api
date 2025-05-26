@@ -18,11 +18,13 @@ func NewCreateWishlistUseCase(
 	getter domain.WishlistByTitleRepository,
 	creator domain.WishlistCreationRepository,
 	customerGetter domain.GetCustomerByIDRepository,
+	idMaker domain.IDGenerator,
 ) *CreateWishlistUseCase {
 	return &CreateWishlistUseCase{
 		Getter:         getter,
 		Creator:        creator,
 		CustomerGetter: customerGetter,
+		IdMaker:        idMaker,
 	}
 }
 func (u *CreateWishlistUseCase) CreateWishlist(ctx context.Context, currentCustomerId string, customerId string, title string) (string, error) {
