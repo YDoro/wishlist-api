@@ -37,7 +37,8 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			setupMocks: func() {
 				mockCustomerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
-					Return(&domain.Customer{ID: "customer_123"}, nil)
+					Return(&domain.Customer{ID: "customer_123"}, nil).
+					Times(1)
 
 				mockWishlistGetter.EXPECT().
 					GetById(gomock.Any(), "wishlist_123").
@@ -46,11 +47,13 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 						CustomerId: "customer_123",
 						Title:      "Birthday Wishlist",
 						Items:      []string{},
-					}, nil)
+					}, nil).
+					Times(1)
 
 				mockWishlistDeleter.EXPECT().
 					DeleteWishlist(gomock.Any(), "wishlist_123").
-					Return(nil)
+					Return(nil).
+					Times(1)
 			},
 			expectedError: nil,
 		},
