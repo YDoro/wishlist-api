@@ -26,3 +26,20 @@ func NewAuthenticationError(authtype domain.AuthMethod) error {
 		AuthType: authtype,
 	}
 }
+
+type UnauthorizedError struct {
+}
+
+func (e *UnauthorizedError) Error() string {
+	return "UnauthorizedError: user is not authorized to access this resource"
+}
+func NewUnauthorizedError() error {
+	return &UnauthorizedError{}
+}
+
+func IsUnauthorizedError(err error) bool {
+	if _, ok := err.(*UnauthorizedError); ok {
+		return true
+	}
+	return false
+}
