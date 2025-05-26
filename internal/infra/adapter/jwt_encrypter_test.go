@@ -65,3 +65,51 @@ func TestJWTEncrypter_Encrypt(t *testing.T) {
 		})
 	}
 }
+
+func TestJWTEncrypter_Decrypt(t *testing.T) {
+	tests := []struct {
+		name      string
+		secret    string
+		plainText string
+		wantErr   bool
+	}{
+		{
+			name:      "successful decryption",
+			secret:    "mysecret",
+			plainText: "hello world",
+			wantErr:   false,
+		},
+		{
+			name:      "empty plain text",
+			secret:    "mysecret",
+			plainText: "",
+			wantErr:   false,
+		},
+		{
+			name:      "wrong secret",
+			secret:    "wrongsecret",
+			plainText: "hello world",
+			wantErr:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			encrypter := adapter.NewJWTEncrypter("mysecret")
+			token, err := encrypter.Encrypt(tt.plainText)
+			assert.NoError(t, err)
+
+			decrypter := adapter.NewJWTEncrypter(tt.secret)
+			decrypted, err := decrypter.Decrypt(token)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Empty(t, decrypted)
+				return
+			}
+
+			assert.NoError(t, err)
+			assert.Equal(t, tt.plainText, decrypted)
+		})
+	}
+}
