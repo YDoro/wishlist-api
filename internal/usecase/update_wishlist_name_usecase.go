@@ -25,7 +25,7 @@ func NewUpdateWishlistNameUseCase(
 	}
 }
 
-func (u *UpdateWishlistNameUseCase) Rename(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, title string) (string, error) {
+func (u *UpdateWishlistNameUseCase) RenameWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, title string) (string, error) {
 	if currentCustomerId != customerId {
 		return "", e.NewUnauthorizedError()
 	}

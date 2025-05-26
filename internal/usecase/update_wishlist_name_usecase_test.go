@@ -204,7 +204,7 @@ func TestUpdateWishlistNameUseCase_Rename(t *testing.T) {
 				mockWishlistUpdater,
 			)
 
-			id, err := uc.Rename(context.Background(), tt.currentCustomerId, tt.customerId, tt.wishlistId, tt.title)
+			id, err := uc.RenameWishlist(context.Background(), tt.currentCustomerId, tt.customerId, tt.wishlistId, tt.title)
 
 			if tt.expectedError != nil {
 				assert.Error(t, err)
