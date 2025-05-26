@@ -15,6 +15,7 @@ type WishlistHandler struct {
 	// Use cases
 	CreateWishlistUseCase domain.CreateWishlistUseCase
 	RenameWishlistUseCase domain.UpdateWishlistNameUseCase
+	DeleteWishlistUseCase domain.DeleteWishlistUseCase
 }
 
 func SetupWishlistHandler(
@@ -22,16 +23,19 @@ func SetupWishlistHandler(
 	auth gin.HandlerFunc,
 	createWishlistUseCase domain.CreateWishlistUseCase,
 	renameWishlistUseCase domain.UpdateWishlistNameUseCase,
+	deleteWishlistUseCase domain.DeleteWishlistUseCase,
 ) {
 	handler := &WishlistHandler{
 		CreateWishlistUseCase: createWishlistUseCase,
 		RenameWishlistUseCase: renameWishlistUseCase,
+		DeleteWishlistUseCase: deleteWishlistUseCase,
 	}
 
 	wishlistRoutes := r.Group("/:customerId/wishlists")
 	wishlistRoutes.Use(auth)
 	wishlistRoutes.POST("/", handler.CreateWishList)
 	wishlistRoutes.PATCH("/:wishListId", handler.RenameWishlist)
+	wishlistRoutes.DELETE("/:wishListId", handler.DeleteWishlist)
 }
 
 // CreateWishList godoc
@@ -172,5 +176,62 @@ func (h WishlistHandler) RenameWishlist(c *gin.Context) {
 	c.JSON(200, outputs.CreateWishlistResponse{
 		ID: wishlistId,
 	})
+	return
+}
+
+// DeleteWishlist godoc
+// @Summary Deletes an existing wishlist
+// @Tags wishlists
+// @Accept json
+// @Produce json
+// @Param customerId path string true "Customer ID"
+// @Param wishListId path string true "Wishlist ID"
+// @Success 204
+// @Failure 400 {object} outputs.ErrorResponse
+// @Failure 401 {object} outputs.ErrorResponse
+// @Failure 404 {object} outputs.ErrorResponse
+// @Failure 500 {object} outputs.ErrorResponse
+// @Router /api/customers/{customerId}/wishlists/{wishListId} [delete]
+// @securityDefinitions.apikey BearerAuth
+// @in Header
+// @name Authorization
+func (h WishlistHandler) DeleteWishlist(c *gin.Context) {
+	cid := c.Param("customerId")
+	wid := c.Param("wishListId")
+
+	if cid == "" || wid == "" {
+		c.JSON(400, outputs.ErrorResponse{
+			Message: "Invalid input"})
+		return
+	}
+
+	var currentCustomer domain.OutgoingCustomer
+	str, _ := c.Get("currentCustomer")
+	json.Unmarshal([]byte(str.(string)), &currentCustomer)
+
+	err := h.DeleteWishlistUseCase.DeleteWishlist(c.Request.Context(), currentCustomer.ID, cid, wid)
+
+	if err != nil {
+		if e.IsNotFoundError(err) {
+			c.JSON(404, outputs.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		if e.IsUnauthorizedError(err) {
+			c.JSON(401, outputs.ErrorResponse{
+				Message: err.Error(),
+			})
+			return
+		}
+
+		fmt.Println(err)
+		c.JSON(500, outputs.ErrorResponse{
+			Message: "Internal server error",
+		})
+		return
+	}
+	c.JSON(204, gin.H{})
 	return
 }
