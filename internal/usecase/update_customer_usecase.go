@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"time"
 
 	"github.com/ydoro/wishlist/internal/domain"
 	e "github.com/ydoro/wishlist/internal/presentation/errors"
@@ -53,6 +54,7 @@ func (u *UpdateCustomerUseCase) UpdateCustomer(ctx context.Context, currentCusto
 		}
 	}
 
+	customer.UpdatedAt = time.Now()
 	err = u.Updater.Update(ctx, customer)
 
 	if err != nil {
