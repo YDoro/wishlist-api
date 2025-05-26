@@ -192,7 +192,6 @@ func TestUpdateCustomerUseCase_UpdateCustomer(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
 			tt.setupMocks()
 
 			uc := usecase.NewUpdateCustomerUseCase(mockUpdater, mockGetter, mockEmailGetter)

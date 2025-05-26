@@ -28,7 +28,7 @@ type ShowWishlistUseCase interface {
 }
 
 type UpdateWishlistNameUseCase interface {
-	UpdateWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, title string) (*FullfilledWishlist, error)
+	RenameWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, title string) (string, error)
 }
 
 type DeleteWishlistUseCase interface {
