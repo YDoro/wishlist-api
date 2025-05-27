@@ -12,7 +12,7 @@ type Wishlist struct {
 
 type FullfilledWishlist struct {
 	ID       string
-	Customer *Customer
+	Customer *OutgoingCustomer
 	Title    string
 	Items    []Product
 }
