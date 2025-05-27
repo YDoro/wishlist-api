@@ -78,6 +78,7 @@ func (r *wishlistRepo) GetByCustomerId(ctx context.Context, customerId string) (
 }
 
 func (r *wishlistRepo) UpdateWishlistName(ctx context.Context, wishlist *domain.Wishlist) error {
+	// TODO - replace this method with update method
 	query := `UPDATE wishlists SET title = $1 WHERE id = $2 AND customer_id = $3`
 	result, err := r.DB.ExecContext(ctx, query, wishlist.Title, wishlist.ID, wishlist.CustomerId)
 	if err != nil {
@@ -96,47 +97,27 @@ func (r *wishlistRepo) UpdateWishlistName(ctx context.Context, wishlist *domain.
 	return nil
 }
 
+func (r *wishlistRepo) Update(ctx context.Context, wishlist *domain.Wishlist) error {
+	query := `UPDATE wishlists SET items = $1, title = $4 WHERE id = $2 AND customer_id = $3`
+	result, err := r.DB.ExecContext(ctx, query, pq.Array(wishlist.Items), wishlist.ID, wishlist.CustomerId, wishlist.Title)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
 func (r *wishlistRepo) DeleteWishlist(ctx context.Context, wishlistId string) error {
 	query := `DELETE FROM wishlists WHERE id = $1`
 	result, err := r.DB.ExecContext(ctx, query, wishlistId)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-
-	return nil
-}
-
-func (r *wishlistRepo) AddItemToWishlist(ctx context.Context, wishlistId string, itemId string) error {
-	query := `UPDATE wishlists SET items = array_append(items, $1) WHERE id = $2`
-	result, err := r.DB.ExecContext(ctx, query, itemId, wishlistId)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-
-	return nil
-}
-
-func (r *wishlistRepo) RemoveItemFromWishlist(ctx context.Context, wishlistId string, itemId string) error {
-	query := `UPDATE wishlists SET items = array_remove(items, $1) WHERE id = $2`
-	result, err := r.DB.ExecContext(ctx, query, itemId, wishlistId)
 	if err != nil {
 		return err
 	}

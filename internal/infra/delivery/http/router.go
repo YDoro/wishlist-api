@@ -19,6 +19,8 @@ func SetupRoutes(
 	wishlistRenamer domain.UpdateWishlistNameUseCase,
 	wishlistDeleter domain.DeleteWishlistUseCase,
 	wishlistGetter domain.ShowWishlistUseCase,
+	productAdder domain.AddProductToWishlistUseCase,
+
 ) *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -26,7 +28,15 @@ func SetupRoutes(
 	NewAuthHandler(api, userAuthentication)
 
 	customerRoutes := NewCustomerHandler(api, customerCreation, authMiddleware, customerGetter, customerUpdater, customerDeleter)
-	SetupWishlistHandler(customerRoutes, authMiddleware, wishlistCreator, wishlistRenamer, wishlistDeleter, wishlistGetter)
+	SetupWishlistHandler(
+		customerRoutes,
+		authMiddleware,
+		wishlistCreator,
+		wishlistRenamer,
+		wishlistDeleter,
+		wishlistGetter,
+		productAdder,
+	)
 
 	return r
 }

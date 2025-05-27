@@ -65,13 +65,10 @@ type UpdateWishlistNameRepository interface {
 	UpdateWishlistName(ctx context.Context, wishlist *Wishlist) error
 }
 
-type DeleteWishlistRepository interface {
-	DeleteWishlist(ctx context.Context, wishlistId string) error
-}
-type AddItemToWishlistRepository interface {
-	AddItemToWishlist(ctx context.Context, wishlistId string, itemId string) error
+type UpdateWishlistRepository interface {
+	Update(ctx context.Context, wishlist *Wishlist) error
 }
 
-type RemoveItemFromWishlistRepository interface {
-	RemoveItemFromWishlist(ctx context.Context, wishlistId string, itemId string) error
+type DeleteWishlistRepository interface {
+	DeleteWishlist(ctx context.Context, wishlistId string) error
 }
