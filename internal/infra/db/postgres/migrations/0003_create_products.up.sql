@@ -6,6 +6,6 @@ CREATE TABLE IF NOT EXISTS products (
     images TEXT[],
     rating JSONB,
     created_at TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT now()
+    updated_at TIMESTAMP DEFAULT now(),
     deleted_at TIMESTAMP DEFAULT NULL
 );
