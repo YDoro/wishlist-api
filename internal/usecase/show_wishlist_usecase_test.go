@@ -93,11 +93,12 @@ func TestShowWishlist_EmptyWishlist(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
+	now := time.Now()
 	customer := &domain.Customer{
 		ID:        "customer1",
 		Name:      "John Doe",
 		Email:     "john@example.com",
-		CreatedAt: time.Now(),
+		CreatedAt: now,
 	}
 
 	emptyWishlist := &domain.Wishlist{
@@ -122,10 +123,17 @@ func TestShowWishlist_EmptyWishlist(t *testing.T) {
 	uc := usecase.NewShowWishlistUseCase(mockWishlistGetter, mockCustomerGetter, mockProductGetter)
 	result, err := uc.ShowWishlist(context.Background(), "customer1", "customer1", "wishlist1")
 
+	outCustomer := &domain.OutgoingCustomer{
+		ID:        customer.ID,
+		Name:      customer.Name,
+		Email:     customer.Email,
+		CreatedAt: customer.CreatedAt,
+	}
+
 	assert.NoError(t, err)
 	assert.Equal(t, emptyWishlist.ID, result.ID)
 	assert.Equal(t, emptyWishlist.Title, result.Title)
-	assert.Equal(t, customer, result.Customer)
+	assert.Equal(t, outCustomer, result.Customer)
 	assert.Empty(t, result.Items)
 }
 
@@ -174,10 +182,17 @@ func TestShowWishlist_WithProducts(t *testing.T) {
 	uc := usecase.NewShowWishlistUseCase(mockWishlistGetter, mockCustomerGetter, mockProductGetter)
 	result, err := uc.ShowWishlist(context.Background(), "customer1", "customer1", "wishlist1")
 
+	outCustomer := &domain.OutgoingCustomer{
+		ID:        customer.ID,
+		Name:      customer.Name,
+		Email:     customer.Email,
+		CreatedAt: customer.CreatedAt,
+	}
+
 	assert.NoError(t, err)
 	assert.Equal(t, wishlist.ID, result.ID)
 	assert.Equal(t, wishlist.Title, result.Title)
-	assert.Equal(t, customer, result.Customer)
+	assert.Equal(t, outCustomer, result.Customer)
 	assert.Len(t, result.Items, 2)
 
 	foundProducts := make(map[string]bool)

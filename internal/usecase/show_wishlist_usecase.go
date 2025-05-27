@@ -55,10 +55,15 @@ func (u *ShowWishlistUseCase) ShowWishlist(ctx context.Context, currentCustomerI
 	}
 
 	ffwl := &domain.FullfilledWishlist{
-		ID:       wishlist.ID,
-		Customer: customer,
-		Title:    wishlist.Title,
-		Items:    make([]domain.Product, 0, len(wishlist.Items)),
+		ID: wishlist.ID,
+		Customer: &domain.OutgoingCustomer{
+			ID:        customer.ID,
+			Name:      customer.Name,
+			Email:     customer.Email,
+			CreatedAt: customer.CreatedAt,
+		},
+		Title: wishlist.Title,
+		Items: make([]domain.Product, 0, len(wishlist.Items)),
 	}
 
 	if len(wishlist.Items) == 0 {
