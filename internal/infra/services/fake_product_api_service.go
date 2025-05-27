@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/ydoro/wishlist/internal/domain"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 )
 
 type FakeProductAPIService struct {
@@ -65,6 +66,9 @@ func (ps *FakeProductAPIService) GetByID(ctx context.Context, productID string) 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		if resp.StatusCode == http.StatusNotFound {
+			return nil, e.NewNotFoundError("product")
+		}
 		return nil, fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
 	}
 

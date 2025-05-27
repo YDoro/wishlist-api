@@ -19,13 +19,22 @@ func NewProductRepository(db *sql.DB) *productRepo {
 	}
 }
 
-func (r *productRepo) Create(ctx context.Context, product *domain.Product) error {
+func (r *productRepo) Upsert(ctx context.Context, product domain.Product) error {
 	query := `
 		INSERT INTO products (
-			id, name, price, description, images, rating, created_at, updated_at
+			id, name, price, description, images, rating, created_at, updated_at, category, deleted_at
 		) VALUES (
-			$1, $2, $3, $4, $5, $6, $7, $8
-		)`
+			$1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+		)
+		ON CONFLICT (id) DO UPDATE SET
+			name = EXCLUDED.name,
+			price = EXCLUDED.price,
+			description = EXCLUDED.description,
+			images = EXCLUDED.images,
+			rating = EXCLUDED.rating,
+			updated_at = EXCLUDED.updated_at,
+			category = EXCLUDED.category,
+			deleted_at = EXCLUDED.deleted_at`
 
 	var ratingJSON []byte
 	var err error
@@ -45,13 +54,15 @@ func (r *productRepo) Create(ctx context.Context, product *domain.Product) error
 		ratingJSON,
 		product.CreatedAt,
 		product.UpdatedAt,
+		product.Category,
+		product.DeletedAt,
 	)
 
 	return err
 }
 
 func (r *productRepo) GetByID(ctx context.Context, productID string) (*domain.Product, error) {
-	query := `SELECT id, name, price, description, images, rating, created_at, updated_at FROM products WHERE id = $1 AND deleted_at IS NULL`
+	query := `SELECT id, name, price, description, images, rating, created_at, updated_at, deleted_at FROM products WHERE id = $1`
 	row := r.DB.QueryRowContext(ctx, query, productID)
 
 	product := &domain.Product{}
@@ -65,6 +76,7 @@ func (r *productRepo) GetByID(ctx context.Context, productID string) (*domain.Pr
 		&ratingJSON,
 		&product.CreatedAt,
 		&product.UpdatedAt,
+		&product.DeletedAt,
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -82,4 +94,10 @@ func (r *productRepo) GetByID(ctx context.Context, productID string) (*domain.Pr
 	}
 
 	return product, nil
+}
+
+func (r *productRepo) Delete(ctx context.Context, productID string) error {
+	query := `UPDATE products SET deleted_at = now() WHERE id = $1`
+	_, err := r.DB.ExecContext(ctx, query, productID)
+	return err
 }
