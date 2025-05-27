@@ -14,19 +14,12 @@ import (
 )
 
 func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockCustomerGetter := mocks.NewMockGetCustomerByIDRepository(ctrl)
-	mockWishlistGetter := mocks.NewMockWishlistByIdRepository(ctrl)
-	mockWishlistDeleter := mocks.NewMockDeleteWishlistRepository(ctrl)
-
 	tests := []struct {
 		name              string
 		currentCustomerId string
 		customerId        string
 		wishlistId        string
-		setupMocks        func()
+		setupMocks        func(*mocks.MockGetCustomerByIDRepository, *mocks.MockWishlistByIdRepository, *mocks.MockDeleteWishlistRepository)
 		expectedError     error
 	}{
 		{
@@ -34,13 +27,15 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil).
 					Times(1)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetById(gomock.Any(), "wishlist_123").
 					Return(&domain.Wishlist{
 						ID:         "wishlist_123",
@@ -50,7 +45,7 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 					}, nil).
 					Times(1)
 
-				mockWishlistDeleter.EXPECT().
+				wishlistDeleter.EXPECT().
 					DeleteWishlist(gomock.Any(), "wishlist_123").
 					Return(nil).
 					Times(1)
@@ -62,16 +57,21 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "different_customer",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks:        func() {},
-			expectedError:     e.NewUnauthorizedError(),
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+			},
+			expectedError: e.NewUnauthorizedError(),
 		},
 		{
 			name:              "customer not found",
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(nil, nil)
 			},
@@ -82,8 +82,10 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(nil, errors.New("database error"))
 			},
@@ -94,12 +96,14 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetById(gomock.Any(), "wishlist_123").
 					Return(nil, nil)
 			},
@@ -110,12 +114,14 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetById(gomock.Any(), "wishlist_123").
 					Return(nil, errors.New("database error"))
 			},
@@ -126,12 +132,14 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetById(gomock.Any(), "wishlist_123").
 					Return(&domain.Wishlist{
 						ID:         "wishlist_123",
@@ -147,12 +155,14 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 			currentCustomerId: "customer_123",
 			customerId:        "customer_123",
 			wishlistId:        "wishlist_123",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByIdRepository,
+				wishlistDeleter *mocks.MockDeleteWishlistRepository) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetById(gomock.Any(), "wishlist_123").
 					Return(&domain.Wishlist{
 						ID:         "wishlist_123",
@@ -161,7 +171,7 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 						Items:      []string{},
 					}, nil)
 
-				mockWishlistDeleter.EXPECT().
+				wishlistDeleter.EXPECT().
 					DeleteWishlist(gomock.Any(), "wishlist_123").
 					Return(errors.New("database error"))
 			},
@@ -170,14 +180,22 @@ func TestDeleteWishlistUseCase_DeleteWishlist(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			tt.setupMocks()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			customerGetter := mocks.NewMockGetCustomerByIDRepository(ctrl)
+			wishlistGetter := mocks.NewMockWishlistByIdRepository(ctrl)
+			wishlistDeleter := mocks.NewMockDeleteWishlistRepository(ctrl)
+
+			tt.setupMocks(customerGetter, wishlistGetter, wishlistDeleter)
 
 			uc := usecase.NewDeleteWishlistUseCase(
-				mockCustomerGetter,
-				mockWishlistGetter,
-				mockWishlistDeleter,
+				customerGetter,
+				wishlistGetter,
+				wishlistDeleter,
 			)
 
 			err := uc.DeleteWishlist(context.Background(), tt.currentCustomerId, tt.customerId, tt.wishlistId)

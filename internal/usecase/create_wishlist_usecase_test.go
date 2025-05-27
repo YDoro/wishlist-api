@@ -14,20 +14,12 @@ import (
 )
 
 func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-
-	mockCustomerGetter := mocks.NewMockGetCustomerByIDRepository(ctrl)
-	mockWishlistGetter := mocks.NewMockWishlistByTitleRepository(ctrl)
-	mockWishlistCreator := mocks.NewMockWishlistCreationRepository(ctrl)
-	mockIDGen := mocks.NewMockIDGenerator(ctrl)
-
 	tests := []struct {
 		name              string
 		currentCustomerID string
 		customerID        string
 		title             string
-		setupMocks        func()
+		setupMocks        func(*mocks.MockGetCustomerByIDRepository, *mocks.MockWishlistByTitleRepository, *mocks.MockWishlistCreationRepository, *mocks.MockIDGenerator)
 		expectedID        string
 		expectedError     error
 	}{
@@ -36,16 +28,19 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetByTitle(gomock.Any(), "customer_123", "Birthday Wishlist").
 					Return(nil, nil)
 
-				mockIDGen.EXPECT().
+				idGen.EXPECT().
 					Generate().
 					Return("wishlist_123", nil)
 
@@ -56,7 +51,7 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 					Items:      []string{},
 				}
 
-				mockWishlistCreator.EXPECT().
+				wishlistCreator.EXPECT().
 					Create(gomock.Any(), matchesWishlist(expectedWishlist)).
 					Return(nil)
 			},
@@ -68,17 +63,24 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "different_customer",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks:        func() {},
-			expectedID:        "",
-			expectedError:     e.NewUnauthorizedError(),
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+			},
+			expectedID:    "",
+			expectedError: e.NewUnauthorizedError(),
 		},
 		{
 			name:              "customer not found",
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(nil, nil)
 			},
@@ -90,8 +92,11 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(nil, errors.New("database error"))
 			},
@@ -103,12 +108,15 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetByTitle(gomock.Any(), "customer_123", "Birthday Wishlist").
 					Return(&domain.Wishlist{}, nil)
 			},
@@ -120,12 +128,15 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetByTitle(gomock.Any(), "customer_123", "Birthday Wishlist").
 					Return(nil, errors.New("database error"))
 			},
@@ -137,16 +148,19 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetByTitle(gomock.Any(), "customer_123", "Birthday Wishlist").
 					Return(nil, nil)
 
-				mockIDGen.EXPECT().
+				idGen.EXPECT().
 					Generate().
 					Return("", errors.New("id generation error"))
 			},
@@ -158,20 +172,23 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			title:             "Birthday Wishlist",
-			setupMocks: func() {
-				mockCustomerGetter.EXPECT().
+			setupMocks: func(customerGetter *mocks.MockGetCustomerByIDRepository,
+				wishlistGetter *mocks.MockWishlistByTitleRepository,
+				wishlistCreator *mocks.MockWishlistCreationRepository,
+				idGen *mocks.MockIDGenerator) {
+				customerGetter.EXPECT().
 					GetByID(gomock.Any(), "customer_123").
 					Return(&domain.Customer{ID: "customer_123"}, nil)
 
-				mockWishlistGetter.EXPECT().
+				wishlistGetter.EXPECT().
 					GetByTitle(gomock.Any(), "customer_123", "Birthday Wishlist").
 					Return(nil, nil)
 
-				mockIDGen.EXPECT().
+				idGen.EXPECT().
 					Generate().
 					Return("wishlist_123", nil)
 
-				mockWishlistCreator.EXPECT().
+				wishlistCreator.EXPECT().
 					Create(gomock.Any(), gomock.Any()).
 					Return(errors.New("database error"))
 			},
@@ -181,15 +198,24 @@ func TestCreateWishlistUseCase_CreateWishlist(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			tt.setupMocks()
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			customerGetter := mocks.NewMockGetCustomerByIDRepository(ctrl)
+			wishlistGetter := mocks.NewMockWishlistByTitleRepository(ctrl)
+			wishlistCreator := mocks.NewMockWishlistCreationRepository(ctrl)
+			idGen := mocks.NewMockIDGenerator(ctrl)
+
+			tt.setupMocks(customerGetter, wishlistGetter, wishlistCreator, idGen)
 
 			uc := usecase.NewCreateWishlistUseCase(
-				mockWishlistGetter,
-				mockWishlistCreator,
-				mockCustomerGetter,
-				mockIDGen,
+				wishlistGetter,
+				wishlistCreator,
+				customerGetter,
+				idGen,
 			)
 
 			id, err := uc.CreateWishlist(context.Background(), tt.currentCustomerID, tt.customerID, tt.title)
