@@ -14,7 +14,7 @@ type FullfilledWishlist struct {
 	ID       string
 	Customer *Customer
 	Title    string
-	Items    []any
+	Items    []Product
 }
 
 // Usecases
@@ -35,12 +35,12 @@ type DeleteWishlistUseCase interface {
 	DeleteWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string) error
 }
 
-type AddItemToWishlistUseCase interface {
-	AddItemToWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, itemId string) (*FullfilledWishlist, error)
+type AddProductToWishlistUseCase interface {
+	AddProduct(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, productId string) error
 }
 
-type RemoveItemFromWishlistUseCase interface {
-	RemoveItemFromWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, itemId string) (*FullfilledWishlist, error)
+type RemoveProductToWishlistUseCase interface {
+	RemoveProduct(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, productId string) (*FullfilledWishlist, error)
 }
 
 // Repositories
