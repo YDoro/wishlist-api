@@ -1,3 +1,5 @@
+//go:generate mockgen --build_flags=--mod=mod -destination=../../mock/domain/cacge_mock.go -package=mocks -source ./cache.go
+
 package domain
 
 import (
