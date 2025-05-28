@@ -103,5 +103,5 @@ func main() {
 		listWishlistUC,
 	)
 
-	router.Run(":8080")
+	router.Run(fmt.Sprintf(":%s", cfg.AppPort))
 }
