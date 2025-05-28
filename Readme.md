@@ -97,7 +97,8 @@ For slice iterations (A.K.A arrays) I've used go routines to run every single it
 
 - Pagination
     - pagination is expected but it's not working because the chosen api does not support pagination
-    
+- Error Handling
+    - Some errors were not well handled and this may cause a usability issue
 - More tests:
     - Currently only the usecase layer has some tests due to `TDD`, but I wish I could make other unit tests
     - Add integration tests
