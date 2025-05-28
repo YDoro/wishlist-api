@@ -56,7 +56,7 @@ func (u *GetProductAndStoreIfNeededUseCase) Execute(ctx context.Context, product
 	product, err := u.serviceRepo.GetByID(ctx, productID)
 
 	if err != nil {
-		if err == e.NewNotFoundError("product") {
+		if e.IsNotFoundError(err) {
 			u.productRemover.Delete(ctx, productID)
 		}
 		fmt.Printf("[get_product_and_store_if_needed_usecase] ERROR fetching from service: %s", err.Error())
