@@ -78,6 +78,7 @@ func main() {
 	deleteCustomerUc := usecase.NewDeleteCustomerUseCase(customerRepo, customerRepo)
 
 	getProductUc := usecase.NewGetProductAndStoreIfNeededUseCase(cfg.CACHE_TTL, redis, productService, productRepo, productRepo, productRepo)
+	listProductUc := usecase.NewListProductsAndStoreUseCase(cfg.CACHE_TTL, redis, productService, productRepo, productRepo, productRepo)
 
 	createWishlistUc := usecase.NewCreateWishlistUseCase(wishlistRepo, wishlistRepo, customerRepo, idGenerator)
 	deleteWishlistUc := usecase.NewDeleteWishlistUseCase(customerRepo, wishlistRepo, wishlistRepo)
@@ -96,6 +97,8 @@ func main() {
 		deleteWishlistUc,
 		getWishlistUC,
 		updateWishlistUC,
+		getProductUc,
+		listProductUc,
 	)
 
 	router.Run(":8080")

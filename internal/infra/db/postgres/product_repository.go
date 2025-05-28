@@ -101,3 +101,54 @@ func (r *productRepo) Delete(ctx context.Context, productID string) error {
 	_, err := r.DB.ExecContext(ctx, query, productID)
 	return err
 }
+
+func (r *productRepo) List(ctx context.Context, limit int, offset int) ([]domain.Product, error) {
+	query := `
+		SELECT id, name, price, description, images, rating, created_at, updated_at, deleted_at 
+		FROM products 
+		WHERE deleted_at IS NULL 
+		ORDER BY created_at DESC 
+		LIMIT $1 OFFSET $2`
+
+	rows, err := r.DB.QueryContext(ctx, query, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var products []domain.Product
+	for rows.Next() {
+		product := &domain.Product{}
+		var ratingJSON []byte
+		err := rows.Scan(
+			&product.ID,
+			&product.Name,
+			&product.Price,
+			&product.Description,
+			pq.Array(&product.Images),
+			&ratingJSON,
+			&product.CreatedAt,
+			&product.UpdatedAt,
+			&product.DeletedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		if ratingJSON != nil {
+			var rating domain.Rating
+			if err := json.Unmarshal(ratingJSON, &rating); err != nil {
+				return nil, err
+			}
+			product.Rating = &rating
+		}
+
+		products = append(products, *product)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
