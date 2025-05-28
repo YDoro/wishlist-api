@@ -2,11 +2,9 @@ package http
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/inputs"
 	"github.com/ydoro/wishlist/internal/presentation/outputs"
 )
@@ -67,20 +65,14 @@ func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 	id, err := h.createCustomerUC.CreateCustomerWithEmail(c, domain.IncommingCustomer(customer))
 
 	if err != nil {
-		if e.IsValidationError(err) {
-			c.JSON(400, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-		fmt.Printf("\nFailed to create customer: %v", err)
-		c.JSON(500, gin.H{"error": "Failed to create customer"})
+		HandleError(c, err)
 		return
 	}
 
 	c.JSON(201, outputs.CreateCustomerResponse{
 		ID: id,
 	})
+	return
 }
 
 // GetCustomerData godoc
@@ -95,32 +87,16 @@ func (h *CunstomerHandler) CreateCustomer(c *gin.Context) {
 // @Failure 500 {object} outputs.ErrorResponse
 // @Router /api/customers/{customerId} [get]
 func (h *CunstomerHandler) ShowCustomerData(c *gin.Context) {
-	id := c.Param("customerId")
-
-	if id == "" {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Invalid input"})
-		return
-	}
-
-	var customer domain.OutgoingCustomer
-
-	str, _ := c.Get("currentCustomer")
-	json.Unmarshal([]byte(str.(string)), &customer)
-
-	res, err := h.showcustomerUC.ShowCustomerData(c, customer.ID, id)
+	h.ensureParams(c)
+	currentCustomer := GetCustomerFromContext(c)
+	res, err := h.showcustomerUC.ShowCustomerData(c, currentCustomer.ID, c.Param("customerId"))
 
 	if err != nil {
-		if e.IsUnauthorizedError(err) {
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-		c.JSON(500, gin.H{"error": "Failed to get customer"})
+		HandleError(c, err)
 		return
 	}
 	c.JSON(200, res)
+	return
 }
 
 // UpdateCustomer godoc
@@ -137,18 +113,8 @@ func (h *CunstomerHandler) ShowCustomerData(c *gin.Context) {
 // @Failure 500 {object} outputs.ErrorResponse
 // @Router /api/customers/{customerId} [patch]
 func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
-	id := c.Param("customerId")
-
-	if id == "" {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Invalid input"})
-		return
-	}
-
-	var currentCustomer domain.OutgoingCustomer
-
-	str, _ := c.Get("currentCustomer")
-	json.Unmarshal([]byte(str.(string)), &currentCustomer)
+	h.ensureParams(c)
+	currentCustomer := GetCustomerFromContext(c)
 
 	var data domain.CustomerEditableFields
 	if err := c.ShouldBindJSON(&data); err != nil {
@@ -157,19 +123,14 @@ func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
 		return
 	}
 
-	res, err := h.updatecustomerUC.UpdateCustomer(c, currentCustomer.ID, id, data)
+	res, err := h.updatecustomerUC.UpdateCustomer(c, currentCustomer.ID, c.Param("customerId"), data)
 
 	if err != nil {
-		if e.IsUnauthorizedError(err) {
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-		c.JSON(500, gin.H{"error": "Failed to get customer"})
+		HandleError(c, err)
 		return
 	}
 	c.JSON(200, res)
+	return
 }
 
 // DeleteCustomer godoc
@@ -185,38 +146,31 @@ func (h *CunstomerHandler) UpdateCustomer(c *gin.Context) {
 // @Failure 500 {object} outputs.ErrorResponse
 // @Router /api/customers/{customerId} [delete]
 func (h *CunstomerHandler) DeleteCustomer(c *gin.Context) {
-	id := c.Param("customerId")
-
-	if id == "" {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Invalid input"})
-		return
-	}
+	h.ensureParams(c)
 
 	var currentCustomer domain.OutgoingCustomer
 
 	str, _ := c.Get("currentCustomer")
 	json.Unmarshal([]byte(str.(string)), &currentCustomer)
 
-	err := h.deleteCustomerUC.DeleteCustomer(c, currentCustomer.ID, id)
+	err := h.deleteCustomerUC.DeleteCustomer(c, currentCustomer.ID, c.Param("customerId"))
 
 	if err != nil {
-		switch {
-		case e.IsUnauthorizedError(err):
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-		case e.IsNotFoundError(err):
-			c.JSON(404, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-		default:
-			c.JSON(500, outputs.ErrorResponse{
-				Message: "Failed to delete customer",
-			})
-		}
+		HandleError(c, err)
 		return
 	}
 
 	c.Status(204)
+	return
+}
+
+func (h CunstomerHandler) ensureParams(c *gin.Context) {
+	cid := c.Param("customerId")
+
+	if cid == "" {
+		c.JSON(400, outputs.ErrorResponse{
+			Message: "Invalid input"})
+		c.Next()
+		return
+	}
 }

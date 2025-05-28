@@ -3,7 +3,6 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/inputs"
 	"github.com/ydoro/wishlist/internal/presentation/outputs"
 )
@@ -33,11 +32,7 @@ func (h *AuthHandler) PasswordAuthentication(c *gin.Context) {
 
 	token, err := h.AuthUseCase.Authenticate(c, credentials)
 	if err != nil {
-		if e.IsAuthenticationError(err) {
-			c.JSON(401, outputs.ErrorResponse{Message: err.Error()})
-			return
-		}
-		c.JSON(500, gin.H{"error": "Authentication failed"})
+		HandleError(c, err)
 		return
 	}
 

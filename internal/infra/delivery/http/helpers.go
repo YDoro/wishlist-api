@@ -1,9 +1,11 @@
 package http
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/ydoro/wishlist/internal/domain"
 	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/outputs"
 )
@@ -35,4 +37,20 @@ func HandleError(c *gin.Context, err error) {
 		})
 		return
 	}
+}
+
+func GetCustomerFromContext(c *gin.Context) *domain.OutgoingCustomer {
+	var currentCustomer domain.OutgoingCustomer
+	str, e := c.Get("currentCustomer")
+
+	if !e {
+		return nil
+	}
+
+	err := json.Unmarshal([]byte(str.(string)), &currentCustomer)
+	if err != nil {
+		return nil
+	}
+
+	return &currentCustomer
 }

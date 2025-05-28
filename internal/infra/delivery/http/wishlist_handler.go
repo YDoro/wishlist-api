@@ -1,12 +1,8 @@
 package http
 
 import (
-	"encoding/json"
-	"fmt"
-
 	"github.com/gin-gonic/gin"
 	"github.com/ydoro/wishlist/internal/domain"
-	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/presentation/inputs"
 	"github.com/ydoro/wishlist/internal/presentation/outputs"
 )
@@ -72,37 +68,11 @@ func (h WishlistHandler) CreateWishList(c *gin.Context) {
 		return
 	}
 
-	var currentCustomer domain.OutgoingCustomer
-	str, _ := c.Get("currentCustomer")
-	json.Unmarshal([]byte(str.(string)), &currentCustomer)
-
+	currentCustomer := GetCustomerFromContext(c)
 	wishlistId, err := h.createWishlistUseCase.CreateWishlist(c.Request.Context(), currentCustomer.ID, cid, input.Title)
 
 	if err != nil {
-		if _, ok := err.(*e.ValidationError); ok {
-			c.JSON(400, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		if e.IsNotFoundError(err) {
-			c.JSON(404, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		if e.IsUnauthorizedError(err) {
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		c.JSON(500, outputs.ErrorResponse{
-			Message: "Internal server error",
-		})
+		HandleError(c, err)
 		return
 	}
 	c.JSON(201, outputs.CreateWishlistResponse{
@@ -139,9 +109,7 @@ func (h WishlistHandler) UpdateWishlist(c *gin.Context) {
 		return
 	}
 
-	var currentCustomer domain.OutgoingCustomer
-	str, _ := c.Get("currentCustomer")
-	json.Unmarshal([]byte(str.(string)), &currentCustomer)
+	currentCustomer := GetCustomerFromContext(c)
 
 	wl := &domain.Wishlist{
 		Title:      input.Title,
@@ -178,40 +146,12 @@ func (h WishlistHandler) UpdateWishlist(c *gin.Context) {
 // @in Header
 // @name Authorization
 func (h WishlistHandler) DeleteWishlist(c *gin.Context) {
-	cid := c.Param("customerId")
-	wid := c.Param("wishListId")
-
-	if cid == "" || wid == "" {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Invalid input"})
-		return
-	}
-
-	var currentCustomer domain.OutgoingCustomer
-	str, _ := c.Get("currentCustomer")
-	json.Unmarshal([]byte(str.(string)), &currentCustomer)
-
-	err := h.deleteWishlistUseCase.DeleteWishlist(c.Request.Context(), currentCustomer.ID, cid, wid)
+	h.ensureParams(c)
+	currentCustomer := GetCustomerFromContext(c)
+	err := h.deleteWishlistUseCase.DeleteWishlist(c.Request.Context(), currentCustomer.ID, c.Param("customerId"), c.Param("wishListId"))
 
 	if err != nil {
-		if e.IsNotFoundError(err) {
-			c.JSON(404, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		if e.IsUnauthorizedError(err) {
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		fmt.Println(err)
-		c.JSON(500, outputs.ErrorResponse{
-			Message: "Internal server error",
-		})
+		HandleError(c, err)
 		return
 	}
 	c.JSON(204, gin.H{})
@@ -235,40 +175,12 @@ func (h WishlistHandler) DeleteWishlist(c *gin.Context) {
 // @in Header
 // @name Authorization
 func (h WishlistHandler) GetWishlist(c *gin.Context) {
-	cid := c.Param("customerId")
-	wid := c.Param("wishListId")
-
-	if cid == "" || wid == "" {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Invalid input"})
-		return
-	}
-
-	var currentCustomer domain.OutgoingCustomer
-	str, _ := c.Get("currentCustomer")
-	json.Unmarshal([]byte(str.(string)), &currentCustomer)
-
-	list, err := h.getWishlistUseCase.ShowWishlist(c.Request.Context(), currentCustomer.ID, cid, wid)
+	h.ensureParams(c)
+	currentCustomer := GetCustomerFromContext(c)
+	list, err := h.getWishlistUseCase.ShowWishlist(c.Request.Context(), currentCustomer.ID, c.Param("customerId"), c.Param("wishListId"))
 
 	if err != nil {
-		if e.IsNotFoundError(err) {
-			c.JSON(404, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		if e.IsUnauthorizedError(err) {
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		fmt.Println(err)
-		c.JSON(500, outputs.ErrorResponse{
-			Message: "Internal server error",
-		})
+		HandleError(c, err)
 		return
 	}
 	c.JSON(200, list)
@@ -282,22 +194,7 @@ func (h WishlistHandler) ensureParams(c *gin.Context) {
 	if cid == "" || wid == "" {
 		c.JSON(400, outputs.ErrorResponse{
 			Message: "Invalid input"})
+		c.Next()
 		return
 	}
-}
-
-func (h WishlistHandler) getCustomerFromContext(c *gin.Context) *domain.OutgoingCustomer {
-	var currentCustomer domain.OutgoingCustomer
-	str, e := c.Get("currentCustomer")
-
-	if !e {
-		return nil
-	}
-
-	err := json.Unmarshal([]byte(str.(string)), &currentCustomer)
-	if err != nil {
-		return nil
-	}
-
-	return &currentCustomer
 }
