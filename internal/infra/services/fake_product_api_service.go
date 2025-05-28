@@ -66,13 +66,14 @@ func (ps *FakeProductAPIService) GetByID(ctx context.Context, productID string) 
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusNotFound {
-			return nil, e.NewNotFoundError("product")
-		}
 		return nil, fmt.Errorf("status code error: %d %s", resp.StatusCode, resp.Status)
 	}
 
 	var p fakeProduct
+	if resp.Body == nil {
+		return nil, e.NewNotFoundError("product")
+	}
+
 	err = json.NewDecoder(resp.Body).Decode(&p)
 	if err != nil {
 		return nil, err
