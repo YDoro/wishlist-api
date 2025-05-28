@@ -18,12 +18,14 @@ _setEnv:
 	fi
 	@echo "ENV=$(VAL)" >> .env
 
-start-dev: _force-build
+start-dev:
 	@make _setEnv VAL=dev
+	@make _force-build
 	@docker compose up -d
 
-start: _force-build
+start: 
 	@make _setEnv VAL=prod
+	@make _force-build
 	@docker compose up
 
 stop:
