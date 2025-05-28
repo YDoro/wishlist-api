@@ -24,6 +24,19 @@ definitions:
       name:
         type: string
     type: object
+  domain.FullfilledWishlist:
+    properties:
+      customer:
+        $ref: '#/definitions/domain.OutgoingCustomer'
+      id:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/domain.Product'
+        type: array
+      title:
+        type: string
+    type: object
   domain.OutgoingCustomer:
     properties:
       created_at:
@@ -34,6 +47,38 @@ definitions:
         type: string
       name:
         type: string
+    type: object
+  domain.Product:
+    properties:
+      category:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      price:
+        type: number
+      rating:
+        $ref: '#/definitions/domain.Rating'
+      updated_at:
+        type: string
+    type: object
+  domain.Rating:
+    properties:
+      average:
+        type: number
+      count:
+        type: integer
     type: object
   inputs.CreateCustomerRequest:
     properties:
@@ -61,6 +106,15 @@ definitions:
     required:
     - email
     - password
+    type: object
+  inputs.UpdateWishlistInput:
+    properties:
+      items:
+        items:
+          type: string
+        type: array
+      title:
+        type: string
     type: object
   outputs.AuthSuccessResponse:
     properties:
@@ -327,7 +381,7 @@ paths:
       summary: Deletes an existing wishlist
       tags:
       - wishlists
-    patch:
+    get:
       consumes:
       - application/json
       parameters:
@@ -341,19 +395,13 @@ paths:
         name: wishListId
         required: true
         type: string
-      - description: Wishlist data
-        in: body
-        name: wishlist
-        required: true
-        schema:
-          $ref: '#/definitions/inputs.CreateWishlistInput'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/outputs.CreateWishlistResponse'
+            $ref: '#/definitions/domain.FullfilledWishlist'
         "400":
           description: Bad Request
           schema:
@@ -370,7 +418,99 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/outputs.ErrorResponse'
-      summary: Renames an existing wishlist
+      summary: Retrieves an existing wishlist
+      tags:
+      - wishlists
+    patch:
+      consumes:
+      - application/json
+      description: update wishlist, updates both title and items if given, if you
+        want to add a single item you need to pass the whole wishlist
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      - description: Wishlist ID
+        in: path
+        name: wishListId
+        required: true
+        type: string
+      - description: Wishlist data
+        in: body
+        name: wishlist
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.UpdateWishlistInput'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: update wishlist
+      tags:
+      - wishlists
+    put:
+      consumes:
+      - application/json
+      description: update wishlist, updates both title and items if given, if you
+        want to add a single item you need to pass the whole wishlist
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      - description: Wishlist ID
+        in: path
+        name: wishListId
+        required: true
+        type: string
+      - description: Wishlist data
+        in: body
+        name: wishlist
+        required: true
+        schema:
+          $ref: '#/definitions/inputs.UpdateWishlistInput'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: update wishlist
       tags:
       - wishlists
 securityDefinitions:

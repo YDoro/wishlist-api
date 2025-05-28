@@ -334,6 +334,133 @@ const docTemplate = `{
             }
         },
         "/api/customers/{customerId}/wishlists/{wishListId}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wishlists"
+                ],
+                "summary": "Retrieves an existing wishlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Customer ID",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Wishlist ID",
+                        "name": "wishListId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.FullfilledWishlist"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "update wishlist, updates both title and items if given, if you want to add a single item you need to pass the whole wishlist",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "wishlists"
+                ],
+                "summary": "update wishlist",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Customer ID",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Wishlist ID",
+                        "name": "wishListId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Wishlist data",
+                        "name": "wishlist",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/inputs.UpdateWishlistInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/outputs.ErrorResponse"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "consumes": [
                     "application/json"
@@ -392,6 +519,7 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "description": "update wishlist, updates both title and items if given, if you want to add a single item you need to pass the whole wishlist",
                 "consumes": [
                     "application/json"
                 ],
@@ -401,7 +529,7 @@ const docTemplate = `{
                 "tags": [
                     "wishlists"
                 ],
-                "summary": "Renames an existing wishlist",
+                "summary": "update wishlist",
                 "parameters": [
                     {
                         "type": "string",
@@ -423,16 +551,13 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/inputs.CreateWishlistInput"
+                            "$ref": "#/definitions/inputs.UpdateWishlistInput"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/outputs.CreateWishlistResponse"
-                        }
+                    "204": {
+                        "description": "No Content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -500,6 +625,26 @@ const docTemplate = `{
                 }
             }
         },
+        "domain.FullfilledWishlist": {
+            "type": "object",
+            "properties": {
+                "customer": {
+                    "$ref": "#/definitions/domain.OutgoingCustomer"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.Product"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "domain.OutgoingCustomer": {
             "type": "object",
             "properties": {
@@ -514,6 +659,55 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "domain.Product": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "images": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "rating": {
+                    "$ref": "#/definitions/domain.Rating"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "domain.Rating": {
+            "type": "object",
+            "properties": {
+                "average": {
+                    "type": "number"
+                },
+                "count": {
+                    "type": "integer"
                 }
             }
         },
@@ -554,6 +748,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "inputs.UpdateWishlistInput": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "title": {
                     "type": "string"
                 }
             }

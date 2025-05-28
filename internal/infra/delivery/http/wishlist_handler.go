@@ -37,6 +37,7 @@ func SetupWishlistHandler(
 	wishlistRoutes.Use(auth)
 	wishlistRoutes.POST("/", handler.CreateWishList)
 	wishlistRoutes.PUT("/:wishListId", handler.UpdateWishlist)
+	wishlistRoutes.PATCH("/:wishListId", handler.UpdateWishlist)
 	wishlistRoutes.DELETE("/:wishListId", handler.DeleteWishlist)
 	wishlistRoutes.GET("/:wishListId", handler.GetWishlist)
 
@@ -112,6 +113,7 @@ func (h WishlistHandler) CreateWishList(c *gin.Context) {
 
 // UpdateWishlist godoc
 // @Summary update wishlist
+// @Description update wishlist, updates both title and items if given, if you want to add a single item you need to pass the whole wishlist
 // @Tags wishlists
 // @Accept json
 // @Produce json
@@ -124,6 +126,7 @@ func (h WishlistHandler) CreateWishList(c *gin.Context) {
 // @Failure 404 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
 // @Router /api/customers/{customerId}/wishlists/{wishListId} [put]
+// @Router /api/customers/{customerId}/wishlists/{wishListId} [patch]
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
