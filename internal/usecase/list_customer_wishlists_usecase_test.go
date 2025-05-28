@@ -188,12 +188,12 @@ func TestListCustomerWishlistsUseCase(t *testing.T) {
 				assert.Nil(t, result)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, tt.expectedLen, len(result))
+				assert.Equal(t, tt.expectedLen, len(*result))
 
 				if tt.expectedLen > 0 {
-					assert.Equal(t, wishlists[0].ID, result[0].ID)
-					assert.Equal(t, customer.ID, result[0].Customer.ID)
-					assert.Equal(t, len(wishlists[0].Items), len(result[0].Items))
+					assert.Equal(t, wishlists[0].ID, (*result)[0].ID)
+					assert.Equal(t, customer.ID, (*result)[0].Customer.ID)
+					assert.Equal(t, len(wishlists[0].Items), len((*result)[0].Items))
 				}
 			}
 		})

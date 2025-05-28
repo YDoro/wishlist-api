@@ -26,7 +26,7 @@ func NewListCustomerWishlistsUseCase(
 	}
 }
 
-func (u *listCustomerWishlistsUseCase) Execute(ctx context.Context, currentCustomerId string, customerId string) ([]*domain.FullfilledWishlist, error) {
+func (u *listCustomerWishlistsUseCase) Execute(ctx context.Context, currentCustomerId string, customerId string) (*[]domain.FullfilledWishlist, error) {
 	if currentCustomerId != customerId {
 		return nil, e.NewUnauthorizedError()
 	}
@@ -47,12 +47,12 @@ func (u *listCustomerWishlistsUseCase) Execute(ctx context.Context, currentCusto
 	return u.fillCustomerWishlists(ctx, wishlists, customer)
 }
 
-func (u *listCustomerWishlistsUseCase) fillCustomerWishlists(ctx context.Context, wishlists []*domain.Wishlist, customer *domain.Customer) ([]*domain.FullfilledWishlist, error) {
+func (u *listCustomerWishlistsUseCase) fillCustomerWishlists(ctx context.Context, wishlists []*domain.Wishlist, customer *domain.Customer) (*[]domain.FullfilledWishlist, error) {
 	if len(wishlists) == 0 {
-		return make([]*domain.FullfilledWishlist, 0), nil
+		return &[]domain.FullfilledWishlist{}, nil
 	}
 
-	filledLists := make([]*domain.FullfilledWishlist, len(wishlists))
+	filledLists := make([]domain.FullfilledWishlist, len(wishlists))
 	var wg sync.WaitGroup
 	errChan := make(chan error, len(wishlists))
 
@@ -75,7 +75,7 @@ func (u *listCustomerWishlistsUseCase) fillCustomerWishlists(ctx context.Context
 					return
 				}
 
-				filledLists[i] = filledList
+				filledLists[i] = *filledList
 			}
 		}(i, wishlist)
 	}
@@ -91,7 +91,7 @@ func (u *listCustomerWishlistsUseCase) fillCustomerWishlists(ctx context.Context
 	default:
 	}
 
-	return filledLists, nil
+	return &filledLists, nil
 }
 
 func (u *listCustomerWishlistsUseCase) fillWishlistWithProducts(ctx context.Context, wishlist *domain.Wishlist, customer *domain.Customer) (*domain.FullfilledWishlist, error) {
