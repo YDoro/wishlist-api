@@ -65,22 +65,24 @@ func (u *UpdateWishListUseCase) UpdateWishlist(ctx context.Context, currentCusto
 		dbWishlist.Title = wishlist.Title
 	}
 
-	var newProducts []string
-	for _, productId := range wishlist.Items {
-		product, err := u.productGetter.Execute(ctx, productId)
+	if wishlist.Items != nil {
+		var newProducts []string
+		for _, productId := range wishlist.Items {
+			product, err := u.productGetter.Execute(ctx, productId)
 
-		if err != nil {
-			fmt.Printf("Error fetching product: %s %v\n", productId, err)
-			return err
-		}
-		if product == nil {
-			return e.NewNotFoundError(fmt.Sprintf("product_%s", productId))
+			if err != nil {
+				fmt.Printf("Error fetching product: %s %v\n", productId, err)
+				return err
+			}
+			if product == nil {
+				return e.NewNotFoundError(fmt.Sprintf("product_%s", productId))
+			}
+
+			newProducts = append(newProducts, productId)
 		}
 
-		newProducts = append(newProducts, productId)
+		dbWishlist.Items = newProducts
 	}
 
-	wishlist.Items = newProducts
-
-	return u.updateRepository.Update(ctx, wishlist)
+	return u.updateRepository.Update(ctx, dbWishlist)
 }
