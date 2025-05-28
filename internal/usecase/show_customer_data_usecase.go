@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/ydoro/wishlist/internal/domain"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 )
 
 type GetCustomerData struct {
@@ -17,10 +18,16 @@ func NewGetCustomerData(getter domain.GetCustomerByIDRepository) *GetCustomerDat
 }
 
 func (g *GetCustomerData) ShowCustomerData(ctx context.Context, currentCustomerId string, id string) (*domain.OutgoingCustomer, error) {
-	// NOTE - here we can check if some usecase specific authentication logic using the currentCustomerId
+	if currentCustomerId != id {
+		return nil, e.NewUnauthorizedError()
+	}
 	customer, err := g.Getter.GetByID(ctx, id)
 	if err != nil {
 		return nil, err
+	}
+
+	if customer == nil {
+		return nil, e.NewNotFoundError("customer")
 	}
 
 	out := &domain.OutgoingCustomer{

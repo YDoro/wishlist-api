@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/ydoro/wishlist/internal/domain"
+	e "github.com/ydoro/wishlist/internal/domain/errors"
 	"github.com/ydoro/wishlist/internal/usecase"
 	mocks "github.com/ydoro/wishlist/mock/domain"
 	"go.uber.org/mock/gomock"
@@ -28,8 +29,16 @@ func TestGetCustomerData_ShowCustomerData(t *testing.T) {
 		expectedError     error
 	}{
 		{
-			name:              "successful customer data retrieval",
+			name:              "unauthorized access - different customer ID",
 			currentCustomerID: "current_id",
+			customerID:        "different_id",
+			setupMocks:        func() {},
+			expectedCustomer:  nil,
+			expectedError:     &e.UnauthorizedError{},
+		},
+		{
+			name:              "successful customer data retrieval",
+			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			setupMocks: func() {
 				customer := &domain.Customer{
@@ -54,19 +63,19 @@ func TestGetCustomerData_ShowCustomerData(t *testing.T) {
 		},
 		{
 			name:              "customer not found",
-			currentCustomerID: "current_id",
-			customerID:        "nonexistent_id",
+			currentCustomerID: "id_123",
+			customerID:        "id_123",
 			setupMocks: func() {
 				mockRepo.EXPECT().
-					GetByID(gomock.Any(), "nonexistent_id").
-					Return(nil, errors.New("customer not found"))
+					GetByID(gomock.Any(), "id_123").
+					Return(nil, nil)
 			},
 			expectedCustomer: nil,
-			expectedError:    errors.New("customer not found"),
+			expectedError:    &e.NotFoundError{Resource: "customer"},
 		},
 		{
 			name:              "repository error",
-			currentCustomerID: "current_id",
+			currentCustomerID: "customer_123",
 			customerID:        "customer_123",
 			setupMocks: func() {
 				mockRepo.EXPECT().
