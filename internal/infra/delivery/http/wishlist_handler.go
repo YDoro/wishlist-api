@@ -13,37 +13,32 @@ import (
 
 type WishlistHandler struct {
 	createWishlistUseCase domain.CreateWishlistUseCase
-	renameWishlistUseCase domain.UpdateWishlistNameUseCase
 	deleteWishlistUseCase domain.DeleteWishlistUseCase
 	getWishlistUseCase    domain.ShowWishlistUseCase
-	productAdder          domain.AddProductToWishlistUseCase
+	updateWishlistUsecase domain.UpdateWishListUseCase
 }
 
 func SetupWishlistHandler(
 	r *gin.RouterGroup,
 	auth gin.HandlerFunc,
 	createWishlistUseCase domain.CreateWishlistUseCase,
-	renameWishlistUseCase domain.UpdateWishlistNameUseCase,
 	deleteWishlistUseCase domain.DeleteWishlistUseCase,
 	getWishlistUseCase domain.ShowWishlistUseCase,
-	productAdder domain.AddProductToWishlistUseCase,
-
+	updateWishlistUsecase domain.UpdateWishListUseCase,
 ) {
 	handler := &WishlistHandler{
 		createWishlistUseCase: createWishlistUseCase,
-		renameWishlistUseCase: renameWishlistUseCase,
 		deleteWishlistUseCase: deleteWishlistUseCase,
 		getWishlistUseCase:    getWishlistUseCase,
-		productAdder:          productAdder,
+		updateWishlistUsecase: updateWishlistUsecase,
 	}
 
 	wishlistRoutes := r.Group("/:customerId/wishlists")
 	wishlistRoutes.Use(auth)
 	wishlistRoutes.POST("/", handler.CreateWishList)
-	wishlistRoutes.PATCH("/:wishListId", handler.RenameWishlist)
+	wishlistRoutes.PUT("/:wishListId", handler.UpdateWishlist)
 	wishlistRoutes.DELETE("/:wishListId", handler.DeleteWishlist)
 	wishlistRoutes.GET("/:wishListId", handler.GetWishlist)
-	wishlistRoutes.POST("/:wishListId/products", handler.AddProductToWishlist)
 
 }
 
@@ -115,34 +110,27 @@ func (h WishlistHandler) CreateWishList(c *gin.Context) {
 	return
 }
 
-// RenameWishlist godoc
-// @Summary Renames an existing wishlist
+// UpdateWishlist godoc
+// @Summary update wishlist
 // @Tags wishlists
 // @Accept json
 // @Produce json
 // @Param customerId path string true "Customer ID"
 // @Param wishListId path string true "Wishlist ID"
-// @Param wishlist body inputs.CreateWishlistInput true "Wishlist data"
-// @Success 200 {object} outputs.CreateWishlistResponse
+// @Param wishlist body inputs.UpdateWishlistInput true "Wishlist data"
+// @Success 204
 // @Failure 400 {object} outputs.ErrorResponse
 // @Failure 401 {object} outputs.ErrorResponse
 // @Failure 404 {object} outputs.ErrorResponse
 // @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/customers/{customerId}/wishlists/{wishListId} [patch]
+// @Router /api/customers/{customerId}/wishlists/{wishListId} [put]
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
-func (h WishlistHandler) RenameWishlist(c *gin.Context) {
-	cid := c.Param("customerId")
-	wid := c.Param("wishListId")
+func (h WishlistHandler) UpdateWishlist(c *gin.Context) {
+	h.ensureParams(c)
 
-	if cid == "" || wid == "" {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Invalid input"})
-		return
-	}
-
-	var input inputs.CreateWishlistInput
+	var input inputs.UpdateWishlistInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid input"})
 		return
@@ -152,39 +140,21 @@ func (h WishlistHandler) RenameWishlist(c *gin.Context) {
 	str, _ := c.Get("currentCustomer")
 	json.Unmarshal([]byte(str.(string)), &currentCustomer)
 
-	wishlistId, err := h.renameWishlistUseCase.RenameWishlist(c.Request.Context(), currentCustomer.ID, cid, wid, input.Title)
+	wl := &domain.Wishlist{
+		Title:      input.Title,
+		ID:         c.Param("wishListId"),
+		CustomerId: c.Param("customerId"),
+		Items:      input.Items,
+	}
+
+	err := h.updateWishlistUsecase.UpdateWishlist(c.Request.Context(), currentCustomer.ID, wl)
 
 	if err != nil {
-		if _, ok := err.(*e.ValidationError); ok {
-			c.JSON(400, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		if e.IsNotFoundError(err) {
-			c.JSON(404, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		if e.IsUnauthorizedError(err) {
-			c.JSON(401, outputs.ErrorResponse{
-				Message: err.Error(),
-			})
-			return
-		}
-
-		fmt.Println(err)
-		c.JSON(500, outputs.ErrorResponse{
-			Message: "Internal server error",
-		})
+		HandleError(c, err)
 		return
 	}
-	c.JSON(200, outputs.CreateWishlistResponse{
-		ID: wishlistId,
-	})
+
+	c.JSON(204, gin.H{})
 	return
 }
 
@@ -299,50 +269,6 @@ func (h WishlistHandler) GetWishlist(c *gin.Context) {
 		return
 	}
 	c.JSON(200, list)
-	return
-}
-
-// AddProductToWishlist godoc
-// @Summary Add product to wishlist
-// @Tags wishlists
-// @Accept json
-// @Produce json
-// @Param customerId path string true "Customer ID"
-// @Param wishListId path string true "Wishlist ID"
-// @Param wishlist body inputs.ProdcutToWishlistInput true "product data"
-// @Success 204
-// @Failure 400 {object} outputs.ErrorResponse
-// @Failure 401 {object} outputs.ErrorResponse
-// @Failure 404 {object} outputs.ErrorResponse
-// @Failure 500 {object} outputs.ErrorResponse
-// @Router /api/customers/{customerId}/wishlists/{wishListId}/products [post]
-// @securityDefinitions.apikey BearerAuth
-// @in Header
-// @name Authorization
-func (h WishlistHandler) AddProductToWishlist(c *gin.Context) {
-	h.ensureParams(c)
-	customer := h.getCustomerFromContext(c)
-
-	if customer == nil {
-		c.JSON(400, outputs.ErrorResponse{
-			Message: "Missing data"})
-		return
-	}
-
-	var data inputs.ProdcutToWishlistInput
-	if err := c.ShouldBindJSON(&data); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid input"})
-		return
-	}
-
-	err := h.productAdder.AddProduct(c.Request.Context(), customer.ID, c.Param("customerId"), c.Param("wishListId"), data.ProductId)
-
-	if err != nil {
-		HandleError(c, err)
-		return
-	}
-
-	c.JSON(204, gin.H{})
 	return
 }
 

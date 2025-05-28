@@ -90,5 +90,5 @@ func (u *GetProductAndStoreIfNeededUseCase) Execute(ctx context.Context, product
 		return product, nil
 	}
 
-	return nil, e.NewNotFoundError("product")
+	return nil, e.NewNotFoundError(fmt.Sprintf("product %s", productID))
 }
