@@ -21,6 +21,7 @@ func SetupRoutes(
 	wishlistUpdater domain.UpdateWishListUseCase,
 	productGetter domain.GetProductUseCase,
 	productLister domain.ListProductsUseCase,
+	wishlistLister domain.ListUserWishlists,
 
 ) *gin.Engine {
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
@@ -37,6 +38,7 @@ func SetupRoutes(
 		wishlistDeleter,
 		wishlistGetter,
 		wishlistUpdater,
+		wishlistLister,
 	)
 
 	return r

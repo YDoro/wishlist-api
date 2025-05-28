@@ -84,6 +84,7 @@ func main() {
 	deleteWishlistUc := usecase.NewDeleteWishlistUseCase(customerRepo, wishlistRepo, wishlistRepo)
 	getWishlistUC := usecase.NewShowWishlistUseCase(wishlistRepo, customerRepo, getProductUc)
 	updateWishlistUC := usecase.NewUpdateWishListUseCase(customerRepo, wishlistRepo, wishlistRepo, getProductUc)
+	listWishlistUC := usecase.NewListCustomerWishlistsUseCase(customerRepo, wishlistRepo, getProductUc)
 
 	router := http.SetupRoutes(
 		r,
@@ -99,6 +100,7 @@ func main() {
 		updateWishlistUC,
 		getProductUc,
 		listProductUc,
+		listWishlistUC,
 	)
 
 	router.Run(":8080")

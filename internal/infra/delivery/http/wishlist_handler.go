@@ -7,11 +7,12 @@ import (
 	"github.com/ydoro/wishlist/internal/presentation/outputs"
 )
 
-type WishlistHandler struct {
+type wishlistHandler struct {
 	createWishlistUseCase domain.CreateWishlistUseCase
 	deleteWishlistUseCase domain.DeleteWishlistUseCase
 	getWishlistUseCase    domain.ShowWishlistUseCase
 	updateWishlistUsecase domain.UpdateWishListUseCase
+	listWishlistUsecase   domain.ListUserWishlists
 }
 
 func SetupWishlistHandler(
@@ -21,17 +22,20 @@ func SetupWishlistHandler(
 	deleteWishlistUseCase domain.DeleteWishlistUseCase,
 	getWishlistUseCase domain.ShowWishlistUseCase,
 	updateWishlistUsecase domain.UpdateWishListUseCase,
+	listWishlistUsecase domain.ListUserWishlists,
 ) {
-	handler := &WishlistHandler{
+	handler := &wishlistHandler{
 		createWishlistUseCase: createWishlistUseCase,
 		deleteWishlistUseCase: deleteWishlistUseCase,
 		getWishlistUseCase:    getWishlistUseCase,
 		updateWishlistUsecase: updateWishlistUsecase,
+		listWishlistUsecase:   listWishlistUsecase,
 	}
 
 	wishlistRoutes := r.Group("/:customerId/wishlists")
 	wishlistRoutes.Use(auth)
 	wishlistRoutes.POST("/", handler.CreateWishList)
+	wishlistRoutes.GET("/", handler.ListWishList)
 	wishlistRoutes.PUT("/:wishListId", handler.UpdateWishlist)
 	wishlistRoutes.PATCH("/:wishListId", handler.UpdateWishlist)
 	wishlistRoutes.DELETE("/:wishListId", handler.DeleteWishlist)
@@ -54,7 +58,7 @@ func SetupWishlistHandler(
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
-func (h WishlistHandler) CreateWishList(c *gin.Context) {
+func (h wishlistHandler) CreateWishList(c *gin.Context) {
 	cid := c.Param("customerId")
 	if cid == "" {
 		c.JSON(400, outputs.ErrorResponse{
@@ -100,7 +104,7 @@ func (h WishlistHandler) CreateWishList(c *gin.Context) {
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
-func (h WishlistHandler) UpdateWishlist(c *gin.Context) {
+func (h wishlistHandler) UpdateWishlist(c *gin.Context) {
 	h.ensureParams(c)
 
 	var input inputs.UpdateWishlistInput
@@ -145,7 +149,7 @@ func (h WishlistHandler) UpdateWishlist(c *gin.Context) {
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
-func (h WishlistHandler) DeleteWishlist(c *gin.Context) {
+func (h wishlistHandler) DeleteWishlist(c *gin.Context) {
 	h.ensureParams(c)
 	currentCustomer := GetCustomerFromContext(c)
 	err := h.deleteWishlistUseCase.DeleteWishlist(c.Request.Context(), currentCustomer.ID, c.Param("customerId"), c.Param("wishListId"))
@@ -174,7 +178,7 @@ func (h WishlistHandler) DeleteWishlist(c *gin.Context) {
 // @securityDefinitions.apikey BearerAuth
 // @in Header
 // @name Authorization
-func (h WishlistHandler) GetWishlist(c *gin.Context) {
+func (h wishlistHandler) GetWishlist(c *gin.Context) {
 	h.ensureParams(c)
 	currentCustomer := GetCustomerFromContext(c)
 	list, err := h.getWishlistUseCase.ShowWishlist(c.Request.Context(), currentCustomer.ID, c.Param("customerId"), c.Param("wishListId"))
@@ -187,7 +191,36 @@ func (h WishlistHandler) GetWishlist(c *gin.Context) {
 	return
 }
 
-func (h WishlistHandler) ensureParams(c *gin.Context) {
+// ListWishList godoc
+// @Summary retrieves customer wishlists
+// @Tags wishlists
+// @Accept json
+// @Produce json
+// @Param customerId path string true "Customer ID"
+// @Success 200 {object} []domain.FullfilledWishlist
+// @Failure 400 {object} outputs.ErrorResponse
+// @Failure 401 {object} outputs.ErrorResponse
+// @Failure 404 {object} outputs.ErrorResponse
+// @Failure 500 {object} outputs.ErrorResponse
+// @Router /api/customers/{customerId}/wishlists [get]
+// @securityDefinitions.apikey BearerAuth
+// @in Header
+// @name Authorization
+func (h wishlistHandler) ListWishList(c *gin.Context) {
+	currentCustomer := GetCustomerFromContext(c)
+	list, err := h.listWishlistUsecase.Execute(c.Request.Context(), currentCustomer.ID, c.Param("customerId"))
+
+	if err != nil {
+		HandleError(c, err)
+		return
+	}
+
+	c.JSON(200, list)
+	return
+
+}
+
+func (h wishlistHandler) ensureParams(c *gin.Context) {
 	cid := c.Param("customerId")
 	wid := c.Param("wishListId")
 
