@@ -27,6 +27,10 @@ type ShowWishlistUseCase interface {
 	ShowWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string) (*FullfilledWishlist, error)
 }
 
+type ListUserWishlists interface {
+	Execute(ctx context.Context, currentCustomerId string, customerId string) (*[]FullfilledWishlist, error)
+}
+
 type DeleteWishlistUseCase interface {
 	DeleteWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string) error
 }
@@ -46,6 +50,10 @@ type WishlistByIdRepository interface {
 
 type WishlistByTitleRepository interface {
 	GetByTitle(ctx context.Context, customerId string, title string) (*Wishlist, error)
+}
+
+type WishlistByCustomerIdRepository interface {
+	GetByCustomerId(ctx context.Context, customerId string) ([]*Wishlist, error)
 }
 
 type UpdateWishlistRepository interface {
