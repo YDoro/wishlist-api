@@ -25,6 +25,10 @@ type GetProductUseCase interface {
 	Execute(ctx context.Context, productID string) (*Product, error)
 }
 
+type ListProductsUseCase interface {
+	Execute(ctx context.Context, count int, offset int) (*[]Product, error)
+}
+
 // both external service and database can implement these interfaces
 type GetProductRepository interface {
 	GetByID(ctx context.Context, productID string) (*Product, error)
