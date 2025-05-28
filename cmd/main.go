@@ -20,7 +20,7 @@ import (
 // @title Wishlist API GO
 // @version 1.0
 // @description A powerful API for managing customers wishlists.
-// @host localhost:8080
+// @host http://localhost:8080
 // @BasePath /
 // @securityDefinitions.apikey BearerAuth
 // @in Header
@@ -72,7 +72,7 @@ func main() {
 
 	authUC := usecase.NewPasswordAuthenticationUseCase(hasher, customerRepo, jwtEcnoder)
 
-	createCustomerUC := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10))
+	createCustomerUC := usecase.NewCreateCustomerUseCase(customerRepo, idGenerator, adapter.NewPasswordHasher(10), customerRepo)
 	showCustomerUC := usecase.NewGetCustomerData(customerRepo)
 	updateCustomerUc := usecase.NewUpdateCustomerUseCase(customerRepo, customerRepo, customerRepo)
 	deleteCustomerUc := usecase.NewDeleteCustomerUseCase(customerRepo, customerRepo)

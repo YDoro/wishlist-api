@@ -21,6 +21,7 @@ func TestCreateCustomerUseCase_CreateCustomerWithEmail(t *testing.T) {
 	mockRepo := mocks.NewMockCustomerCreationRepository(ctrl)
 	mockIDGen := mocks.NewMockIDGenerator(ctrl)
 	mockHasher := mocks.NewMockHasher(ctrl)
+	mockCustomerGetter := mocks.NewMockGetCustomerByEmailRepository(ctrl)
 
 	tests := []struct {
 		name          string
@@ -37,6 +38,11 @@ func TestCreateCustomerUseCase_CreateCustomerWithEmail(t *testing.T) {
 				Password: "password123",
 			},
 			setupMocks: func() {
+				mockCustomerGetter.EXPECT().
+					GetByEmail(gomock.Any(), "john@example.com").
+					Return(nil, nil).
+					Times(1)
+
 				mockHasher.EXPECT().
 					Hash("password123").
 					Return("hashed_password", nil)
@@ -80,6 +86,11 @@ func TestCreateCustomerUseCase_CreateCustomerWithEmail(t *testing.T) {
 				Password: "password123",
 			},
 			setupMocks: func() {
+				mockCustomerGetter.EXPECT().
+					GetByEmail(gomock.Any(), "john@example.com").
+					Return(nil, nil).
+					Times(1)
+
 				mockHasher.EXPECT().
 					Hash("password123").
 					Return("", errors.New("hashing error"))
@@ -95,6 +106,11 @@ func TestCreateCustomerUseCase_CreateCustomerWithEmail(t *testing.T) {
 				Password: "password123",
 			},
 			setupMocks: func() {
+				mockCustomerGetter.EXPECT().
+					GetByEmail(gomock.Any(), "john@example.com").
+					Return(nil, nil).
+					Times(1)
+
 				mockHasher.EXPECT().
 					Hash("password123").
 					Return("hashed_password", nil)
@@ -114,6 +130,11 @@ func TestCreateCustomerUseCase_CreateCustomerWithEmail(t *testing.T) {
 				Password: "password123",
 			},
 			setupMocks: func() {
+				mockCustomerGetter.EXPECT().
+					GetByEmail(gomock.Any(), "john@example.com").
+					Return(nil, nil).
+					Times(1)
+
 				mockHasher.EXPECT().
 					Hash("password123").
 					Return("hashed_password", nil)
@@ -129,13 +150,32 @@ func TestCreateCustomerUseCase_CreateCustomerWithEmail(t *testing.T) {
 			expectedID:    "generated_id",
 			expectedError: errors.New("repository error"),
 		},
+		{
+			name: "email already in use",
+			input: domain.IncommingCustomer{
+				Name:     "John Doe",
+				Email:    "existing@example.com",
+				Password: "password123",
+			},
+			setupMocks: func() {
+				mockCustomerGetter.EXPECT().
+					GetByEmail(gomock.Any(), "existing@example.com").
+					Return(&domain.Customer{
+						ID:    "existing_id",
+						Email: "existing@example.com",
+					}, nil).
+					Times(1)
+			},
+			expectedID:    "",
+			expectedError: &e.ValidationError{Field: "email", Err: "email already in use"},
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setupMocks()
 
-			uc := usecase.NewCreateCustomerUseCase(mockRepo, mockIDGen, mockHasher)
+			uc := usecase.NewCreateCustomerUseCase(mockRepo, mockIDGen, mockHasher, mockCustomerGetter)
 			id, err := uc.CreateCustomerWithEmail(context.Background(), tt.input)
 
 			if tt.expectedError != nil {
