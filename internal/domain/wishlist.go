@@ -27,10 +27,6 @@ type ShowWishlistUseCase interface {
 	ShowWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string) (*FullfilledWishlist, error)
 }
 
-type UpdateWishlistNameUseCase interface {
-	RenameWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, title string) (string, error)
-}
-
 type DeleteWishlistUseCase interface {
 	DeleteWishlist(ctx context.Context, currentCustomerId string, customerId string, wishlistId string) error
 }
@@ -38,16 +34,8 @@ type DeleteWishlistUseCase interface {
 type UpdateWishListUseCase interface {
 	UpdateWishlist(ctx context.Context, currentCustomerId string, wishlist *Wishlist) error
 }
-type AddProductToWishlistUseCase interface {
-	AddProduct(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, productId string) error
-}
-
-type RemoveProductToWishlistUseCase interface {
-	RemoveProduct(ctx context.Context, currentCustomerId string, customerId string, wishlistId string, productId string) (*FullfilledWishlist, error)
-}
 
 // Repositories
-
 type WishlistCreationRepository interface {
 	Create(ctx context.Context, wishlist *Wishlist) error
 }
@@ -58,10 +46,6 @@ type WishlistByIdRepository interface {
 
 type WishlistByTitleRepository interface {
 	GetByTitle(ctx context.Context, customerId string, title string) (*Wishlist, error)
-}
-
-type UpdateWishlistNameRepository interface {
-	UpdateWishlistName(ctx context.Context, wishlist *Wishlist) error
 }
 
 type UpdateWishlistRepository interface {

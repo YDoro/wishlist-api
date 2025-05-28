@@ -77,26 +77,6 @@ func (r *wishlistRepo) GetByCustomerId(ctx context.Context, customerId string) (
 	return wishlists, nil
 }
 
-func (r *wishlistRepo) UpdateWishlistName(ctx context.Context, wishlist *domain.Wishlist) error {
-	// TODO - replace this method with update method
-	query := `UPDATE wishlists SET title = $1 WHERE id = $2 AND customer_id = $3`
-	result, err := r.DB.ExecContext(ctx, query, wishlist.Title, wishlist.ID, wishlist.CustomerId)
-	if err != nil {
-		return err
-	}
-
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return err
-	}
-
-	if rowsAffected == 0 {
-		return sql.ErrNoRows
-	}
-
-	return nil
-}
-
 func (r *wishlistRepo) Update(ctx context.Context, wishlist *domain.Wishlist) error {
 	query := `UPDATE wishlists SET items = $1, title = $4 WHERE id = $2 AND customer_id = $3`
 	result, err := r.DB.ExecContext(ctx, query, pq.Array(wishlist.Items), wishlist.ID, wishlist.CustomerId, wishlist.Title)
