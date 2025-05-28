@@ -305,6 +305,43 @@ paths:
       tags:
       - customers
   /api/customers/{customerId}/wishlists:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Customer ID
+        in: path
+        name: customerId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.FullfilledWishlist'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: retrieves customer wishlists
+      tags:
+      - wishlists
     post:
       consumes:
       - application/json
@@ -513,6 +550,73 @@ paths:
       summary: update wishlist
       tags:
       - wishlists
+  /api/products:
+    get:
+      consumes:
+      - application/json
+      description: Returns a paginated list of products
+      parameters:
+      - description: Page number
+        in: query
+        name: page
+        type: string
+      - description: 'Page size (default: 20)'
+        in: query
+        name: size
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Product'
+            type: array
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: List all products with pagination
+      tags:
+      - products
+  /api/products/{productId}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves detailed information about a specific product
+      parameters:
+      - description: Product ID
+        in: path
+        name: productId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Product'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "404":
+          description: Product not found
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/outputs.ErrorResponse'
+      summary: Get product details by ID
+      tags:
+      - products
 securityDefinitions:
   BearerAuth:
     in: Header
